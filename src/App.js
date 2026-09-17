@@ -52,6 +52,61 @@ function App() {
     setCurrentReview((current) => (current + 1) % reviews.length);
   };
 
+  // ================= APPOINTMENT SUBMIT =================
+
+const [appointmentStatus, setAppointmentStatus] = useState('');
+const [isSubmitting, setIsSubmitting] = useState(false);
+
+const handleAppointmentSubmit = async (event) => {
+  event.preventDefault();
+
+  setIsSubmitting(true);
+  setAppointmentStatus('');
+
+  const form = event.target;
+
+  const appointmentData = {
+    name: form.name.value,
+    phone: form.phone.value,
+    email: form.email.value,
+    vehicle: form.vehicle.value,
+    service: form.service.value,
+    preferredDate: form.preferredDate.value,
+    preferredTime: form.preferredTime.value,
+    message: form.message.value
+  };
+
+  try {
+    const response = await fetch('http://localhost:5000/api/appointments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(appointmentData)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Unable to submit appointment.');
+    }
+
+    setAppointmentStatus(
+      'SUCCESS: Your appointment request has been received. We will contact you to confirm.'
+    );
+
+    form.reset();
+  } catch (error) {
+    console.error(error);
+
+    setAppointmentStatus(
+      'ERROR: Unable to send your appointment request. Please try again.'
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="App">
@@ -824,7 +879,10 @@ function App() {
             </div>
 
 
-            <form className="appointment-form">
+            <form
+              className="appointment-form"
+              onSubmit={handleAppointmentSubmit}
+            >
 
               <div className="form-row">
 
@@ -836,6 +894,7 @@ function App() {
 
                   <input
                     id="appointment-name"
+                    name="name"
                     type="text"
                     placeholder="Your name"
                     required
@@ -852,6 +911,7 @@ function App() {
 
                   <input
                     id="appointment-phone"
+                    name="phone"
                     type="tel"
                     placeholder="Your phone number"
                     required
@@ -870,6 +930,7 @@ function App() {
 
                 <input
                   id="appointment-email"
+                  name="email"
                   type="email"
                   placeholder="Your email address"
                   required
@@ -886,12 +947,13 @@ function App() {
                     VEHICLE *
                   </label>
 
-                  <input
-                    id="appointment-vehicle"
-                    type="text"
-                    placeholder="Year, make and model"
-                    required
-                  />
+                <input
+                  id="appointment-vehicle"
+                  name="vehicle"
+                  type="text"
+                  placeholder="Year, make and model"
+                  required
+                />
 
                 </div>
 
@@ -904,6 +966,7 @@ function App() {
 
                   <select
                     id="appointment-service"
+                    name="service"
                     defaultValue=""
                     required
                   >
@@ -953,6 +1016,7 @@ function App() {
 
                   <input
                     id="appointment-date"
+                    name="preferredDate"
                     type="date"
                     required
                   />
@@ -965,9 +1029,9 @@ function App() {
                   <label htmlFor="appointment-time">
                     PREFERRED TIME *
                   </label>
-
                   <input
                     id="appointment-time"
+                    name="preferredTime"
                     type="time"
                     required
                   />
@@ -985,24 +1049,26 @@ function App() {
 
                 <textarea
                   id="appointment-message"
+                  name="message"
                   rows="5"
                   placeholder="Tell us about your vehicle or the service you need..."
                 ></textarea>
 
               </div>
 
-
               <button
                 type="submit"
                 className="appointment-submit"
+                disabled={isSubmitting}
               >
-                REQUEST APPOINTMENT →
+                {isSubmitting ? 'SENDING...' : 'REQUEST APPOINTMENT →'}
               </button>
 
-
-              <p className="appointment-note">
-                Appointment requests are subject to confirmation.
-              </p>
+              {appointmentStatus && (
+                <p className="appointment-note">
+                  {appointmentStatus}
+                </p>
+              )}
 
             </form>
 
