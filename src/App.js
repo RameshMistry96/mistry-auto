@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Admin from './Admin';
 import './App.css';
 
 function App() {
@@ -108,8 +109,12 @@ const handleAppointmentSubmit = async (event) => {
 };
 
 
-  return (
-    <div className="App">
+if (window.location.pathname === '/admin') {
+  return <Admin />;
+}
+
+return (
+  <div className="App">
 
       {/* ================= NAVBAR ================= */}
       <header className="navbar">
