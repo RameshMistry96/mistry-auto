@@ -2425,3 +2425,209 @@ body {
   }
 
 }
+
+/* ================= SERVICE DETAILS POPUP ================= */
+
+.service-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.service-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 10, 14, 0.88);
+  backdrop-filter: blur(6px);
+}
+
+.service-modal-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 46% 54%;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.service-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: #111820;
+  color: #ffffff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.service-modal-close:hover {
+  background: #159ee4;
+}
+
+.service-modal-image {
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.service-modal-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.service-modal-info {
+  padding: 65px 55px 55px;
+  color: #111820;
+}
+
+.service-modal-small {
+  display: block;
+  margin-bottom: 12px;
+  color: #159ee4;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.service-modal-info h2 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.08;
+  font-weight: 900;
+}
+
+.service-modal-line {
+  width: 55px;
+  height: 4px;
+  margin: 20px 0 24px;
+  background: #159ee4;
+}
+
+.service-modal-description {
+  margin: 0 0 30px;
+  color: #626a70;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.service-modal-info h3 {
+  margin: 0 0 16px;
+  color: #111820;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+}
+
+.service-modal-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.service-modal-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.service-modal-list-item span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  background: rgba(21, 158, 228, 0.12);
+  color: #159ee4;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.service-modal-list-item p {
+  margin: 0;
+  color: #444c52;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.service-modal-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 25px;
+  background: #159ee4;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  transition: 0.2s ease;
+}
+
+.service-modal-book:hover {
+  background: #111820;
+}
+
+
+/* ================= SERVICE LEARN MORE BUTTON ================= */
+
+.service-learn-more {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #159ee4;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+}
+
+.service-learn-more:hover {
+  color: #111820;
+}
+
+
+/* ================= SERVICE POPUP MOBILE ================= */
+
+@media (max-width: 800px) {
+
+  .service-modal {
+    padding: 18px;
+  }
+
+  .service-modal-content {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+  }
+
+  .service-modal-image {
+    min-height: 240px;
+    height: 240px;
+  }
+
+  .service-modal-info {
+    padding: 38px 28px 35px;
+  }
+
+  .service-modal-info h2 {
+    font-size: 29px;
+  }
+
+}

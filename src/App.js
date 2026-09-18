@@ -35,6 +35,10 @@ function App() {
 
   const [currentReview, setCurrentReview] = useState(0);
 
+  // ================= SERVICE DETAILS =================
+
+const [selectedService, setSelectedService] = useState(null);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentReview((current) => (current + 1) % reviews.length);
@@ -219,68 +223,320 @@ return (
             image="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80"
             title="SAFETY"
             description="Professional vehicle safety inspections to help keep your vehicle safe and road-ready."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'SAFETY',
+                image:
+                  'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Our vehicle safety inspection helps identify important safety-related concerns and ensures your vehicle is properly inspected by our automotive service team.',
+                includes: [
+                  'Vehicle safety inspection',
+                  'Brake system inspection',
+                  'Tire and wheel inspection',
+                  'Steering and suspension inspection',
+                  'Lights and safety equipment check'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=900&q=80"
             title="OIL CHANGE & TRANSMISSION SERVICE"
             description="Oil changes and transmission service to help protect your vehicle and maintain reliable performance."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'OIL CHANGE & TRANSMISSION SERVICE',
+                image:
+                  'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Regular oil and transmission service helps protect important vehicle components and supports smooth, reliable performance.',
+                includes: [
+                  'Engine oil change',
+                  'Oil filter replacement',
+                  'Fluid level inspection',
+                  'Transmission fluid inspection',
+                  'Transmission service when required'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1632823471565-1ecdf5c6d7f0?auto=format&fit=crop&w=900&q=80"
             title="BRAKE JOB"
             description="Brake inspection, maintenance and repair for dependable stopping performance."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'BRAKE JOB',
+                image:
+                  'https://images.unsplash.com/photo-1632823471565-1ecdf5c6d7f0?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Our brake service helps identify worn or damaged brake components and restore dependable braking performance.',
+                includes: [
+                  'Brake system inspection',
+                  'Brake pad inspection and replacement',
+                  'Rotor inspection and service',
+                  'Brake fluid inspection',
+                  'Brake performance check'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=900&q=80"
             title="TUNE-UP"
             description="Routine tune-up services to help your engine run smoothly, efficiently and reliably."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'TUNE-UP',
+                image:
+                  'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Routine tune-up service can help maintain engine performance, reliability and fuel efficiency.',
+                includes: [
+                  'Engine performance inspection',
+                  'Spark plug inspection and replacement',
+                  'Air filter inspection',
+                  'Fluid level inspection',
+                  'General engine condition check'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1504222490345-c075b6008014?auto=format&fit=crop&w=900&q=80"
             title="SUSPENSION"
             description="Suspension inspection and repair for improved handling, stability and ride comfort."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'SUSPENSION',
+                image:
+                  'https://images.unsplash.com/photo-1504222490345-c075b6008014?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Our suspension service helps identify worn or damaged components that may affect handling, stability and ride comfort.',
+                includes: [
+                  'Suspension system inspection',
+                  'Shock and strut inspection',
+                  'Control arm inspection',
+                  'Ball joint inspection',
+                  'Steering component inspection'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=900&q=80"
             title="TIRE CHANGE & BALANCING"
             description="Professional tire changes and balancing for smooth, safe and dependable driving."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'TIRE CHANGE & BALANCING',
+                image:
+                  'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Professional tire service helps provide a smoother ride and supports proper handling and tire performance.',
+                includes: [
+                  'Seasonal tire change',
+                  'Tire mounting',
+                  'Wheel balancing',
+                  'Tire condition inspection',
+                  'Tire pressure check'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=80"
             title="EXHAUST REPAIR"
             description="Inspection and repair of exhaust system components to keep your vehicle operating properly."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'EXHAUST REPAIR',
+                image:
+                  'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'We inspect exhaust system components for damage, leaks and wear and provide repairs when required.',
+                includes: [
+                  'Exhaust system inspection',
+                  'Exhaust leak inspection',
+                  'Muffler inspection and repair',
+                  'Pipe and connection inspection',
+                  'Damaged component replacement'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7f?auto=format&fit=crop&w=900&q=80"
             title="RUST PROOFING"
             description="Rust protection services designed to help protect your vehicle from corrosion."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'RUST PROOFING',
+                image:
+                  'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7f?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Rust proofing helps protect vulnerable areas of your vehicle from moisture, road salt and corrosion.',
+                includes: [
+                  'Vehicle condition inspection',
+                  'Rust-prone area inspection',
+                  'Protective rust treatment',
+                  'Underbody protection',
+                  'Corrosion prevention service'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&q=80"
             title="A/C & HEATING"
             description="Air conditioning and heating inspection and repair for comfortable driving year-round."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'A/C & HEATING',
+                image:
+                  'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'Our A/C and heating service helps diagnose climate-control problems so your vehicle stays comfortable throughout the year.',
+                includes: [
+                  'A/C system inspection',
+                  'Heating system inspection',
+                  'Airflow inspection',
+                  'Climate-control diagnosis',
+                  'System repair when required'
+                ]
+              })
+            }
           />
+
 
           <ServiceCard
             image="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80"
             title="ELECTRICAL REPAIR"
             description="Professional diagnosis and repair of automotive electrical and electronic systems."
+            onLearnMore={() =>
+              setSelectedService({
+                title: 'ELECTRICAL REPAIR',
+                image:
+                  'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80',
+                description:
+                  'We diagnose automotive electrical problems and repair affected components to help restore reliable vehicle operation.',
+                includes: [
+                  'Electrical system diagnosis',
+                  'Battery and charging system inspection',
+                  'Starter system inspection',
+                  'Lighting system diagnosis',
+                  'Wiring and electrical component inspection'
+                ]
+              })
+            }
           />
 
         </div>
 
       </section>
 
+{/* ================= SERVICE DETAILS POPUP ================= */}
 
-      {/* ================= WHY CHOOSE US ================= */}
+{selectedService && (
+
+  <div className="service-modal">
+
+    <div
+      className="service-modal-overlay"
+      onClick={() => setSelectedService(null)}
+    ></div>
+
+    <div className="service-modal-content">
+
+      <button
+        type="button"
+        className="service-modal-close"
+        onClick={() => setSelectedService(null)}
+        aria-label="Close service details"
+      >
+        ×
+      </button>
+
+
+      <div className="service-modal-image">
+
+        <img
+          src={selectedService.image}
+          alt={selectedService.title}
+        />
+
+      </div>
+
+
+      <div className="service-modal-info">
+
+        <span className="service-modal-small">
+          MISTRY AUTO SERVICE
+        </span>
+
+        <h2>{selectedService.title}</h2>
+
+        <div className="service-modal-line"></div>
+
+        <p className="service-modal-description">
+          {selectedService.description}
+        </p>
+
+
+        <h3>SERVICE MAY INCLUDE</h3>
+
+        <div className="service-modal-list">
+
+          {selectedService.includes.map((item, index) => (
+
+            <div
+              className="service-modal-list-item"
+              key={index}
+            >
+              <span>✓</span>
+              <p>{item}</p>
+            </div>
+
+          ))}
+
+        </div>
+
+
+        <a
+          href="#appointment"
+          className="service-modal-book"
+          onClick={() => setSelectedService(null)}
+        >
+          BOOK APPOINTMENT →
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+
+
+{/* ================= WHY CHOOSE US ================= */}
       <section className="why-section">
 
         <div className="why-container">
@@ -1207,7 +1463,12 @@ return (
 
 /* ================= SERVICE CARD ================= */
 
-function ServiceCard({ image, title, description }) {
+function ServiceCard({
+  image,
+  title,
+  description,
+  onLearnMore
+}) {
 
   return (
 
@@ -1222,16 +1483,19 @@ function ServiceCard({ image, title, description }) {
 
       </div>
 
-
       <div className="service-content">
 
         <h3>{title}</h3>
 
         <p>{description}</p>
 
-        <a href="#service-details">
+        <button
+          type="button"
+          className="service-learn-more"
+          onClick={onLearnMore}
+        >
           LEARN MORE →
-        </a>
+        </button>
 
       </div>
 
