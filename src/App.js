@@ -39,7 +39,104 @@ function App() {
 
 const [selectedService, setSelectedService] = useState(null);
 
-  useEffect(() => {
+// ================= GALLERY =================
+
+const [galleryFilter, setGalleryFilter] = useState('ALL');
+const [galleryItems, setGalleryItems] = useState([]);
+const [galleryExpanded, setGalleryExpanded] = useState(false);
+const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
+
+useEffect(() => {
+
+  const loadGallery = async () => {
+
+    try {
+
+      const response = await fetch(
+        'http://localhost:5000/api/gallery'
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGalleryItems(data.items);
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Unable to load gallery:',
+        error
+      );
+
+    }
+
+  };
+
+  loadGallery();
+
+}, []);
+
+const filteredGalleryItems = galleryItems.filter((item) => {
+
+  if (galleryFilter === 'ALL') {
+    return true;
+  }
+
+  if (galleryFilter === 'VIDEOS') {
+    return item.type === 'video';
+  }
+
+  return item.category === galleryFilter;
+
+});
+
+const visibleGalleryItems = galleryExpanded
+  ? filteredGalleryItems
+  : filteredGalleryItems.slice(0, 6);
+
+const showPreviousGalleryItem = () => {
+
+  const currentIndex = filteredGalleryItems.findIndex(
+    (item) =>
+      item.src === selectedGalleryItem?.src
+  );
+
+  if (currentIndex === -1) return;
+
+  const previousIndex =
+    currentIndex === 0
+      ? filteredGalleryItems.length - 1
+      : currentIndex - 1;
+
+  setSelectedGalleryItem(
+    filteredGalleryItems[previousIndex]
+  );
+
+};
+
+
+const showNextGalleryItem = () => {
+
+  const currentIndex = filteredGalleryItems.findIndex(
+    (item) =>
+      item.src === selectedGalleryItem?.src
+  );
+
+  if (currentIndex === -1) return;
+
+  const nextIndex =
+    currentIndex === filteredGalleryItems.length - 1
+      ? 0
+      : currentIndex + 1;
+
+  setSelectedGalleryItem(
+    filteredGalleryItems[nextIndex]
+  );
+
+};
+
+useEffect(() => {
     const timer = setInterval(() => {
       setCurrentReview((current) => (current + 1) % reviews.length);
     }, 5500);
@@ -220,14 +317,13 @@ return (
         <div className="services-grid">
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/safety.png"
             title="SAFETY"
             description="Professional vehicle safety inspections to help keep your vehicle safe and road-ready."
             onLearnMore={() =>
               setSelectedService({
                 title: 'SAFETY',
-                image:
-                  'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/safety.png',
                 description:
                   'Our vehicle safety inspection helps identify important safety-related concerns and ensures your vehicle is properly inspected by our automotive service team.',
                 includes: [
@@ -243,14 +339,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/oil-change.png"
             title="OIL CHANGE & TRANSMISSION SERVICE"
             description="Oil changes and transmission service to help protect your vehicle and maintain reliable performance."
             onLearnMore={() =>
               setSelectedService({
                 title: 'OIL CHANGE & TRANSMISSION SERVICE',
-                image:
-                  'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/oil-change.png',
                 description:
                   'Regular oil and transmission service helps protect important vehicle components and supports smooth, reliable performance.',
                 includes: [
@@ -266,14 +361,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1632823471565-1ecdf5c6d7f0?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/brake-job.png"
             title="BRAKE JOB"
             description="Brake inspection, maintenance and repair for dependable stopping performance."
             onLearnMore={() =>
               setSelectedService({
                 title: 'BRAKE JOB',
-                image:
-                  'https://images.unsplash.com/photo-1632823471565-1ecdf5c6d7f0?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/brake-job.png',
                 description:
                   'Our brake service helps identify worn or damaged brake components and restore dependable braking performance.',
                 includes: [
@@ -289,14 +383,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/tune-up.png"
             title="TUNE-UP"
             description="Routine tune-up services to help your engine run smoothly, efficiently and reliably."
             onLearnMore={() =>
               setSelectedService({
                 title: 'TUNE-UP',
-                image:
-                  'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/tune-up.png',
                 description:
                   'Routine tune-up service can help maintain engine performance, reliability and fuel efficiency.',
                 includes: [
@@ -312,14 +405,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1504222490345-c075b6008014?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/suspension.png"
             title="SUSPENSION"
             description="Suspension inspection and repair for improved handling, stability and ride comfort."
             onLearnMore={() =>
               setSelectedService({
                 title: 'SUSPENSION',
-                image:
-                  'https://images.unsplash.com/photo-1504222490345-c075b6008014?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/suspension.png',
                 description:
                   'Our suspension service helps identify worn or damaged components that may affect handling, stability and ride comfort.',
                 includes: [
@@ -335,14 +427,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/tire-service.png"
             title="TIRE CHANGE & BALANCING"
             description="Professional tire changes and balancing for smooth, safe and dependable driving."
             onLearnMore={() =>
               setSelectedService({
                 title: 'TIRE CHANGE & BALANCING',
-                image:
-                  'https://images.unsplash.com/photo-1578844251758-2f71da64c96f?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/tire-service.png',
                 description:
                   'Professional tire service helps provide a smoother ride and supports proper handling and tire performance.',
                 includes: [
@@ -358,14 +449,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/exhaust-repair.png"
             title="EXHAUST REPAIR"
             description="Inspection and repair of exhaust system components to keep your vehicle operating properly."
             onLearnMore={() =>
               setSelectedService({
                 title: 'EXHAUST REPAIR',
-                image:
-                  'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/exhaust-repair.png',
                 description:
                   'We inspect exhaust system components for damage, leaks and wear and provide repairs when required.',
                 includes: [
@@ -381,14 +471,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7f?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/rust-proofing.png"
             title="RUST PROOFING"
             description="Rust protection services designed to help protect your vehicle from corrosion."
             onLearnMore={() =>
               setSelectedService({
                 title: 'RUST PROOFING',
-                image:
-                  'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7f?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/rust-proofing.png',
                 description:
                   'Rust proofing helps protect vulnerable areas of your vehicle from moisture, road salt and corrosion.',
                 includes: [
@@ -404,14 +493,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/ac-heating.png"
             title="A/C & HEATING"
             description="Air conditioning and heating inspection and repair for comfortable driving year-round."
             onLearnMore={() =>
               setSelectedService({
                 title: 'A/C & HEATING',
-                image:
-                  'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/ac-heating.png',
                 description:
                   'Our A/C and heating service helps diagnose climate-control problems so your vehicle stays comfortable throughout the year.',
                 includes: [
@@ -427,14 +515,13 @@ return (
 
 
           <ServiceCard
-            image="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80"
+            image="/images/services/electrical-repair.png"
             title="ELECTRICAL REPAIR"
             description="Professional diagnosis and repair of automotive electrical and electronic systems."
             onLearnMore={() =>
               setSelectedService({
                 title: 'ELECTRICAL REPAIR',
-                image:
-                  'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=900&q=80',
+                image: '/images/services/electrical-repair.png',
                 description:
                   'We diagnose automotive electrical problems and repair affected components to help restore reliable vehicle operation.',
                 includes: [
@@ -543,10 +630,10 @@ return (
 
           <div className="why-image">
 
-            <img
-              src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1200&q=85"
-              alt="Professional automotive repair"
-            />
+              <img
+                src="/images/why-choose-us.png"
+                alt="Mistry Auto professional automotive repair shop"
+              />
 
             <div className="why-image-box">
 
@@ -687,7 +774,7 @@ return (
           <div className="about-image">
 
             <img
-              src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1400&q=85"
+              src="/images/about-garage.png"
               alt="Mistry Auto Repair Center automotive service"
             />
 
@@ -743,94 +830,170 @@ return (
 
           </div>
 
-
           <div className="gallery-filters">
 
-            <button className="gallery-filter active">
-              ALL
-            </button>
+            {[
+              'ALL',
+              'GARAGE',
+              'REPAIRS',
+              'CARS',
+              'BEFORE & AFTER',
+              'VIDEOS'
+            ].map((filter) => (
 
-            <button className="gallery-filter">
-              GARAGE
-            </button>
+              <button
+                key={filter}
+                type="button"
+                className={`gallery-filter ${
+                  galleryFilter === filter ? 'active' : ''
+                }`}
+                onClick={() => {
+                setGalleryFilter(filter);
+                setGalleryExpanded(false);
+              }}
+              >
+                {filter}
+              </button>
 
-            <button className="gallery-filter">
-              REPAIRS
-            </button>
-
-            <button className="gallery-filter">
-              CARS
-            </button>
-
-            <button className="gallery-filter">
-              BEFORE & AFTER
-            </button>
-
-            <button className="gallery-filter">
-              VIDEOS
-            </button>
-
-          </div>
-
-
-          <div className="gallery-grid">
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1400&q=85"
-              category="GARAGE"
-              title="INSIDE THE SHOP"
-              large
-            />
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1000&q=85"
-              category="REPAIRS"
-              title="ENGINE SERVICE"
-            />
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1000&q=85"
-              category="REPAIRS"
-              title="PROFESSIONAL REPAIR"
-            />
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7f?auto=format&fit=crop&w=1000&q=85"
-              category="CARS"
-              title="VEHICLE CARE"
-            />
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1000&q=85"
-              category="GARAGE"
-              title="AUTO SERVICE"
-            />
-
-            <GalleryItem
-              image="https://images.unsplash.com/photo-1504222490345-c075b6008014?auto=format&fit=crop&w=1000&q=85"
-              category="VIDEOS"
-              title="WORK IN ACTION"
-              video
-            />
+            ))}
 
           </div>
 
 
-          <div className="gallery-bottom">
+            <div className="gallery-grid">
 
-            <p>
-              More photos and videos from Mistry Auto Repair Center
-              will be added here.
-            </p>
+              {visibleGalleryItems.map((item, index) => (
 
-          </div>
+              <GalleryItem
+                key={`${item.category}-${item.name}-${index}`}
+                image={item.src}
+                category={item.category}
+                title={item.name}
+                video={item.type === 'video'}
+                large={index === 0}
+                onClick={() => setSelectedGalleryItem(item)}
+              />
+
+              ))}
+
+            </div>
+
+            <div className="gallery-bottom">
+
+              {filteredGalleryItems.length > 6 && (
+
+                <button
+                  type="button"
+                  className="gallery-view-more"
+                  onClick={() =>
+                    setGalleryExpanded(!galleryExpanded)
+                  }
+                >
+                  {galleryExpanded
+                    ? 'SHOW LESS ↑'
+                    : `VIEW MORE (${filteredGalleryItems.length - 6}) ↓`
+                  }
+                </button>
+
+              )}
+
+              <p>
+                More photos and videos from Mistry Auto Repair Center
+                will be added here.
+              </p>
+
+            </div>
 
         </div>
 
-      </section>
+          </section>
 
 
-      {/* ================= REVIEWS ================= */}
+          {/* ================= GALLERY LIGHTBOX ================= */}
+
+          {selectedGalleryItem && (
+
+            <div className="gallery-lightbox">
+
+              <div
+                className="gallery-lightbox-overlay"
+                onClick={() => setSelectedGalleryItem(null)}
+              ></div>
+
+              <div className="gallery-lightbox-content">
+
+                <button
+                  type="button"
+                  className="gallery-lightbox-arrow gallery-lightbox-prev"
+                  onClick={showPreviousGalleryItem}
+                  aria-label="Previous gallery item"
+                >
+                  ‹
+                </button>
+
+                <button
+                  type="button"
+                  className="gallery-lightbox-arrow gallery-lightbox-next"
+                  onClick={showNextGalleryItem}
+                  aria-label="Next gallery item"
+                >
+                  ›
+                </button>
+
+                <button
+                  type="button"
+                  className="gallery-lightbox-close"
+                  onClick={() => setSelectedGalleryItem(null)}
+                  aria-label="Close gallery"
+                >
+                  ×
+                </button>
+
+                {selectedGalleryItem.type === 'video' ? (
+
+                  <video
+                    src={selectedGalleryItem.src}
+                    controls
+                    autoPlay
+                    className="gallery-lightbox-media"
+                  >
+                    Your browser does not support video playback.
+                  </video>
+
+                ) : (
+
+                  <img
+                    src={selectedGalleryItem.src}
+                    alt={selectedGalleryItem.name}
+                    className="gallery-lightbox-media"
+                  />
+
+                )}
+
+                <div className="gallery-lightbox-info">
+
+                  <span>
+                    {selectedGalleryItem.category}
+                  </span>
+
+                <h3>
+                  {getGalleryTitle(
+                    selectedGalleryItem.name,
+                    selectedGalleryItem.type === 'video',
+                    selectedGalleryItem.category
+                  )}
+                </h3>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          )}
+
+
+{/* ================= REVIEWS ================= */}
       <section className="reviews-section" id="reviews">
 
         <div className="reviews-container">
@@ -1554,6 +1717,21 @@ function AboutItem({ number, title, text }) {
   );
 }
 
+const getGalleryTitle = (title, video, category) => {
+
+  if (video) {
+    return 'MISTRY AUTO VIDEO';
+  }
+
+  const categoryTitles = {
+    GARAGE: 'INSIDE MISTRY AUTO',
+    REPAIRS: 'AUTO REPAIR',
+    CARS: 'CUSTOMER VEHICLE',
+    'BEFORE & AFTER': 'BEFORE & AFTER'
+  };
+
+  return categoryTitles[category] || 'MISTRY AUTO';
+};
 
 /* ================= GALLERY ITEM ================= */
 
@@ -1562,22 +1740,38 @@ function GalleryItem({
   category,
   title,
   large = false,
-  video = false
+  video = false,
+  onClick
 }) {
 
   return (
+      <div
+        className={`gallery-item ${
+          large ? 'gallery-large' : ''
+        }`}
+        onClick={onClick}
+        role="button"
+        tabIndex="0"
+      >
 
-    <div
-      className={`gallery-item ${
-        large ? 'gallery-large' : ''
-      }`}
-    >
+      {video ? (
 
-      <img
-        src={image}
-        alt={title}
-      />
+        <video
+          src={image}
+          muted
+          preload="metadata"
+          playsInline
+          className="gallery-preview-video"
+        />
 
+      ) : (
+
+        <img
+          src={image}
+          alt={title}
+        />
+
+      )}
 
       <div className="gallery-overlay">
 
@@ -1585,7 +1779,7 @@ function GalleryItem({
 
           <span>{category}</span>
 
-          <h3>{title}</h3>
+          <h3>{getGalleryTitle(title, video, category)}</h3>
 
         </div>
 

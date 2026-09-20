@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
@@ -88,6 +89,109 @@ app.get('/api/test', (req, res) => {
     success: true,
     message: 'Mistry Auto backend is working!'
   });
+});
+
+// ================= GALLERY API =================
+
+app.get('/api/gallery', (req, res) => {
+
+  const galleryPath = path.join(
+    __dirname,
+    '..',
+    'public',
+    'gallery'
+  );
+
+  const categories = {
+    GARAGE: 'garage',
+    REPAIRS: 'repairs',
+    CARS: 'cars',
+    'BEFORE & AFTER': 'before-after',
+    VIDEOS: 'videos'
+  };
+
+  const imageExtensions = [
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.webp',
+    '.gif'
+  ];
+
+  const videoExtensions = [
+    '.mp4',
+    '.webm',
+    '.mov'
+  ];
+
+  const galleryItems = [];
+
+  try {
+
+    Object.entries(categories).forEach(
+      ([category, folder]) => {
+
+        const folderPath = path.join(
+          galleryPath,
+          folder
+        );
+
+        if (!fs.existsSync(folderPath)) {
+          return;
+        }
+
+        const files = fs.readdirSync(folderPath);
+
+        files.forEach((file) => {
+
+          const extension =
+            path.extname(file).toLowerCase();
+
+          let type = null;
+
+          if (imageExtensions.includes(extension)) {
+            type = 'image';
+          }
+
+          if (videoExtensions.includes(extension)) {
+            type = 'video';
+          }
+
+          if (!type) {
+            return;
+          }
+
+          galleryItems.push({
+            name: file,
+            category,
+            type,
+            src: `/gallery/${folder}/${file}`
+          });
+
+        });
+
+      }
+    );
+
+    res.json({
+      success: true,
+      items: galleryItems
+    });
+
+  } catch (error) {
+
+    console.error(
+      'Gallery error:',
+      error
+    );
+
+    res.status(500).json({
+      success: false,
+      message: 'Unable to load gallery.'
+    });
+
+  }
+
 });
 
 // ================= ADMIN LOGIN =================
