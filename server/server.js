@@ -82,6 +82,26 @@ db.run(`
   );
 });
 
+// ================= BLOCKED DATES TABLE =================
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS blocked_dates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    blocked_date TEXT NOT NULL UNIQUE,
+    reason TEXT DEFAULT 'Fully Booked',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`, (err) => {
+  if (err) {
+    console.error(
+      'Blocked dates table error:',
+      err.message
+    );
+  } else {
+    console.log('Blocked dates table ready.');
+  }
+});
+
 // ================= TEST ROUTE =================
 
 app.get('/api/test', (req, res) => {
@@ -234,6 +254,39 @@ app.post('/api/admin/login', (req, res) => {
   });
 });
 
+// ================= PUBLIC BLOCKED DATES =================
+
+// ================= PUBLIC BLOCKED DATES =================
+
+app.get('/api/blocked-dates', (req, res) => {
+  db.all(
+    `
+      SELECT blocked_date, reason
+      FROM blocked_dates
+      ORDER BY blocked_date ASC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('Blocked dates error:', err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to load unavailable dates.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        blockedDates: rows.map((row) => ({
+          date: row.blocked_date,
+          reason: row.reason || 'Fully Booked'
+        }))
+      });
+    }
+  );
+});
+
 // ================= CREATE APPOINTMENT =================
 
 app.post('/api/appointments', (req, res) => {
@@ -264,6 +317,107 @@ app.post('/api/appointments', (req, res) => {
       message: 'Please complete all required fields.'
     });
   }
+
+  // ================= DATE & TIME VALIDATION =================
+
+const selectedDate = new Date(`${preferredDate}T12:00:00`);
+
+if (Number.isNaN(selectedDate.getTime())) {
+  return res.status(400).json({
+    success: false,
+    message: 'Please select a valid appointment date.'
+  });
+}
+
+// Do not allow past dates
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+const appointmentDate = new Date(selectedDate);
+appointmentDate.setHours(0, 0, 0, 0);
+
+if (appointmentDate < today) {
+  return res.status(400).json({
+    success: false,
+    message: 'Please select today or a future date.'
+  });
+}
+
+// Sunday closed
+if (selectedDate.getDay() === 0) {
+  return res.status(400).json({
+    success: false,
+    message: 'We are closed on Sundays. Please select another date.'
+  });
+}
+
+// Check business hours
+const isSaturday = selectedDate.getDay() === 6;
+
+const openingTime = '09:00';
+const closingTime = isSaturday ? '15:00' : '18:30';
+
+if (
+  preferredTime < openingTime ||
+  preferredTime > closingTime
+) {
+  return res.status(400).json({
+    success: false,
+    message: isSaturday
+      ? 'Saturday appointments are available from 9:00 AM to 3:00 PM.'
+      : 'Appointments are available from 9:00 AM to 6:30 PM.'
+  });
+}
+
+// ================= CHECK BLOCKED DATE =================
+
+db.get(
+  `SELECT id, reason FROM blocked_dates WHERE blocked_date = ?`,
+  [preferredDate],
+  (blockedDateError, blockedDateRow) => {
+
+    if (blockedDateError) {
+      console.error(
+        'Blocked date check error:',
+        blockedDateError.message
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: 'Unable to check appointment availability.'
+      });
+    }
+
+if (blockedDateRow) {
+  const reason = blockedDateRow.reason || 'Fully Booked';
+
+  let message =
+    'This date is unavailable for appointments. Please select another date.';
+
+  if (reason === 'Fully Booked') {
+    message =
+      'We are fully booked on this date. Please select another available date.';
+  }
+
+  if (reason === 'Shop Closed') {
+    message =
+      'Our shop will be closed on this date. Please select another date.';
+  }
+
+  if (reason === 'Holiday') {
+    message =
+      'Our shop will be closed for a holiday on this date. Please select another date.';
+  }
+
+  return res.status(409).json({
+    success: false,
+    code: 'DATE_BLOCKED',
+    reason,
+    message
+  });
+}
+
+    // ================= SAVE APPOINTMENT =================
 
   // ================= SAVE APPOINTMENT =================
 
@@ -1101,7 +1255,11 @@ Submitted through the Mistry Auto Repair Center website.
       });
     }
   );
+
+  }
+);
 });
+
 
 // ================= ADMIN SECURITY =================
 
@@ -1127,6 +1285,133 @@ const requireAdmin = (req, res, next) => {
     });
   }
 };
+
+// ================= BLOCKED DATES API =================
+
+// GET BLOCKED DATES
+
+app.get('/api/admin/blocked-dates', requireAdmin, (req, res) => {
+  db.all(
+    `
+      SELECT blocked_date, reason
+      FROM blocked_dates
+      ORDER BY blocked_date ASC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error(err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to load blocked dates.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        blockedDates: rows
+      });
+    }
+  );
+});
+
+
+// BLOCK DATE
+
+app.post('/api/admin/blocked-dates', requireAdmin, (req, res) => {
+  const { blockedDate, reason } = req.body;
+
+  if (!blockedDate) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please select a date.'
+    });
+  }
+
+  db.run(
+    `
+      INSERT INTO blocked_dates (
+        blocked_date,
+        reason
+      )
+      VALUES (?, ?)
+    `,
+    [
+      blockedDate,
+      reason || 'Fully Booked'
+    ],
+    function (err) {
+      if (err) {
+        if (err.message.includes('UNIQUE')) {
+          return res.status(400).json({
+            success: false,
+            message: 'This date is already blocked.'
+          });
+        }
+
+        console.error(err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to block this date.'
+        });
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: 'Date blocked successfully.',
+        blockedDate: {
+          id: this.lastID,
+          blocked_date: blockedDate,
+          reason: reason || 'Fully Booked'
+        }
+      });
+    }
+  );
+});
+
+
+// UNBLOCK DATE
+
+app.delete(
+  '/api/admin/blocked-dates/:id',
+  requireAdmin,
+  (req, res) => {
+    db.run(
+      `
+        DELETE FROM blocked_dates
+        WHERE id = ?
+      `,
+      [req.params.id],
+      function (err) {
+        if (err) {
+          console.error(err.message);
+
+          return res.status(500).json({
+            success: false,
+            message: 'Unable to unblock this date.'
+          });
+        }
+
+        if (this.changes === 0) {
+          return res.status(404).json({
+            success: false,
+            message: 'Blocked date not found.'
+          });
+        }
+
+        return res.json({
+          success: true,
+          message: 'Date is available again.'
+        });
+      }
+    );
+  }
+);
+
+
+// ================= GET APPOINTMENTS =================
 
 // ================= GET APPOINTMENTS =================
 

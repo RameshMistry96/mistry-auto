@@ -2806,3 +2806,227 @@ body {
   }
 
 }
+
+/* ================= APPOINTMENT AVAILABILITY ================= */
+
+.admin-block-date-section {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  margin: 24px 0;
+  border-bottom: 3px solid #159ee4;
+}
+
+.admin-block-date-header span {
+  display: block;
+  color: #159ee4;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.admin-block-date-header h2 {
+  margin: 0;
+  color: #101820;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.admin-block-date-header p {
+  margin: 6px 0 20px;
+  color: #6d7780;
+  font-size: 13px;
+}
+
+.admin-block-date-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-block-date-form input,
+.admin-block-date-form select {
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dce2e7;
+  border-radius: 7px;
+  background: #f8fafb;
+  color: #101820;
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-block-date-form input:focus,
+.admin-block-date-form select:focus {
+  border-color: #159ee4;
+}
+
+.admin-block-date-form button {
+  height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 7px;
+  background: #159ee4;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-block-date-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-block-date-message {
+  margin-top: 14px;
+  padding: 11px 14px;
+  background: #eef8fd;
+  border: 1px solid #cceafb;
+  border-radius: 6px;
+  color: #1676a8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-blocked-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-blocked-date-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 11px 12px 11px 15px;
+  background: #f6f8fa;
+  border: 1px solid #e1e6ea;
+  border-radius: 7px;
+}
+
+.admin-blocked-date-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-blocked-date-item strong {
+  color: #101820;
+  font-size: 13px;
+}
+
+.admin-blocked-date-item span {
+  color: #7a858e;
+  font-size: 11px;
+}
+
+.admin-blocked-date-item button {
+  border: 0;
+  background: #ffe7e7;
+  color: #c12d2d;
+  padding: 8px 11px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 650px) {
+  .admin-block-date-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-block-date-form input,
+  .admin-block-date-form select,
+  .admin-block-date-form button {
+    width: 100%;
+  }
+}
+/* ================= APPOINTMENT STATUS ================= */
+
+.appointment-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.appointment-status-icon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.appointment-status-content {
+  flex: 1;
+}
+
+.appointment-status-content strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.appointment-status-content p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ERROR / UNAVAILABLE */
+
+.appointment-status-error {
+  background: #fff3f3;
+  border: 1px solid #f2caca;
+  border-left: 4px solid #d83b3b;
+}
+
+.appointment-status-error .appointment-status-icon {
+  background: #d83b3b;
+  color: #ffffff;
+}
+
+.appointment-status-error strong {
+  color: #b72828;
+}
+
+.appointment-status-error p {
+  color: #6f3d3d;
+}
+
+/* SUCCESS */
+
+.appointment-status-success {
+  background: #effaf5;
+  border: 1px solid #c9eadb;
+  border-left: 4px solid #239b68;
+}
+
+.appointment-status-success .appointment-status-icon {
+  background: #239b68;
+  color: #ffffff;
+}
+
+.appointment-status-success strong {
+  color: #18734d;
+}
+
+.appointment-status-success p {
+  color: #416b59;
+}

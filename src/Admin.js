@@ -16,6 +16,13 @@ function Admin() {
   const [dashboardError, setDashboardError] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
   const [archivingId, setArchivingId] = useState(null);
+  // ================= BLOCK DATES =================
+
+const [blockedDates, setBlockedDates] = useState([]);
+const [blockDate, setBlockDate] = useState('');
+const [blockReason, setBlockReason] = useState('Fully Booked');
+const [blockingDate, setBlockingDate] = useState(false);
+const [blockDateMessage, setBlockDateMessage] = useState('');
 
   // Search + Filter + Sort + View
   const [searchTerm, setSearchTerm] = useState('');
@@ -113,8 +120,38 @@ function Admin() {
   useEffect(() => {
     if (isLoggedIn) {
       loadAppointments();
+      loadBlockedDates();
     }
   }, [isLoggedIn]);
+
+  // ================= LOAD BLOCKED DATES =================
+
+const loadBlockedDates = async () => {
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      'http://localhost:5000/api/admin/blocked-dates',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      setBlockedDates(data.blockedDates || []);
+    }
+  } catch (error) {
+    console.error('Unable to load blocked dates:', error);
+  }
+};
 
   // ================= UPDATE STATUS =================
 
@@ -233,6 +270,84 @@ function Admin() {
       setArchivingId(null);
     }
   };
+
+  // ================= BLOCK DATE =================
+
+const handleBlockDate = async () => {
+  if (!blockDate) {
+    setBlockDateMessage('Please select a date.');
+    return;
+  }
+
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  setBlockingDate(true);
+  setBlockDateMessage('');
+
+  try {
+    const response = await fetch(
+      'http://localhost:5000/api/admin/blocked-dates',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          blockedDate: blockDate,
+          reason: blockReason
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Unable to block date.');
+    }
+
+    setBlockDateMessage('Date blocked successfully.');
+    setBlockDate('');
+    setBlockReason('Fully Booked');
+
+    await loadBlockedDates();
+  } catch (error) {
+    setBlockDateMessage(error.message);
+  } finally {
+    setBlockingDate(false);
+  }
+};
+
+
+// ================= UNBLOCK DATE =================
+
+const handleUnblockDate = async (id) => {
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/admin/blocked-dates/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Unable to unblock date.');
+    }
+
+    setBlockDateMessage('Date is available again.');
+
+    await loadBlockedDates();
+  } catch (error) {
+    setBlockDateMessage(error.message);
+  }
+};
 
   // ================= LOGOUT =================
 
@@ -503,6 +618,81 @@ function Admin() {
                 }
               </strong>
             </div>
+
+          </div>
+
+          {/* ================= APPOINTMENT AVAILABILITY ================= */}
+
+          <div className="admin-block-date-section">
+
+            <div className="admin-block-date-header">
+              <div>
+                <span>APPOINTMENT AVAILABILITY</span>
+                <h2>Block Appointment Date</h2>
+                <p>
+                  Block a date when the shop is fully booked or closed.
+                </p>
+              </div>
+            </div>
+
+            <div className="admin-block-date-form">
+
+              <input
+                type="date"
+                value={blockDate}
+                min={new Date().toLocaleDateString('en-CA')}
+                onChange={(e) => setBlockDate(e.target.value)}
+              />
+
+              <select
+                value={blockReason}
+                onChange={(e) => setBlockReason(e.target.value)}
+              >
+                <option value="Fully Booked">Fully Booked</option>
+                <option value="Holiday">Holiday</option>
+                <option value="Shop Closed">Shop Closed</option>
+              </select>
+
+              <button
+                type="button"
+                onClick={handleBlockDate}
+                disabled={blockingDate}
+              >
+                {blockingDate ? 'BLOCKING...' : 'BLOCK DATE'}
+              </button>
+
+            </div>
+
+            {blockDateMessage && (
+              <div className="admin-block-date-message">
+                {blockDateMessage}
+              </div>
+            )}
+
+            {blockedDates.length > 0 && (
+              <div className="admin-blocked-dates">
+
+                {blockedDates.map((item) => (
+                  <div
+                    className="admin-blocked-date-item"
+                    key={item.id}
+                  >
+                    <div>
+                      <strong>{formatDate(item.blocked_date)}</strong>
+                      <span>{item.reason}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleUnblockDate(item.id)}
+                    >
+                      UNBLOCK
+                    </button>
+                  </div>
+                ))}
+
+              </div>
+            )}
 
           </div>
 

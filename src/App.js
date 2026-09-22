@@ -158,6 +158,61 @@ useEffect(() => {
 
 const [appointmentStatus, setAppointmentStatus] = useState('');
 const [isSubmitting, setIsSubmitting] = useState(false);
+const [blockedAppointmentDates, setBlockedAppointmentDates] = useState([]);
+
+useEffect(() => {
+  const loadBlockedAppointmentDates = async () => {
+    try {
+      const response = await fetch(
+        'http://localhost:5000/api/blocked-dates'
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setBlockedAppointmentDates(data.blockedDates || []);
+      }
+    } catch (error) {
+      console.error(
+        'Unable to load blocked appointment dates:',
+        error
+      );
+    }
+  };
+
+  loadBlockedAppointmentDates();
+}, []);
+
+const handleAppointmentDateChange = (event) => {
+  const selectedDate = event.target.value;
+
+  setAppointmentStatus('');
+
+  const blockedDate = blockedAppointmentDates.find(
+    (item) => item.date === selectedDate
+  );
+
+  if (!blockedDate) {
+    return;
+  }
+
+  if (blockedDate.reason === 'Holiday') {
+    setAppointmentStatus(
+      'ERROR: Our shop will be closed for a holiday on this date. Please select another date.'
+    );
+  } else if (blockedDate.reason === 'Shop Closed') {
+    setAppointmentStatus(
+      'ERROR: Our shop will be closed on this date. Please select another date.'
+    );
+  } else {
+    setAppointmentStatus(
+      'ERROR: We are fully booked on this date. Please select another available date.'
+    );
+  }
+
+  event.target.value = '';
+};
+
 
 const handleAppointmentSubmit = async (event) => {
   event.preventDefault();
@@ -165,9 +220,36 @@ const handleAppointmentSubmit = async (event) => {
   setIsSubmitting(true);
   setAppointmentStatus('');
 
-  const form = event.target;
+const form = event.target;
 
-  const appointmentData = {
+    // Do not allow Sunday appointments
+    const selectedDate = new Date(
+      `${form.preferredDate.value}T12:00:00`
+    );
+
+// Check business hours
+const selectedTime = form.preferredTime.value;
+
+const isSaturday = selectedDate.getDay() === 6;
+
+const openingTime = '09:00';
+const closingTime = isSaturday ? '15:00' : '18:30';
+
+    if (
+      selectedTime < openingTime ||
+      selectedTime > closingTime
+    ) {
+      setAppointmentStatus(
+        isSaturday
+          ? 'ERROR: Saturday appointments are available from 9:00 AM to 3:00 PM.'
+          : 'ERROR: Appointments are available from 9:00 AM to 6:30 PM.'
+      );
+
+      setIsSubmitting(false);
+      return;
+    }
+
+    const appointmentData = {
     name: form.name.value,
     phone: form.phone.value,
     email: form.email.value,
@@ -198,13 +280,13 @@ const handleAppointmentSubmit = async (event) => {
     );
 
     form.reset();
-  } catch (error) {
-    console.error(error);
+} catch (error) {
+  console.error(error);
 
-    setAppointmentStatus(
-      'ERROR: Unable to send your appointment request. Please try again.'
-    );
-  } finally {
+  setAppointmentStatus(
+    `ERROR: ${error.message || 'Unable to send your appointment request. Please try again.'}`
+  );
+} finally {
     setIsSubmitting(false);
   }
 };
@@ -1442,6 +1524,8 @@ return (
                     id="appointment-date"
                     name="preferredDate"
                     type="date"
+                    min={new Date().toLocaleDateString('en-CA')}
+                    onChange={handleAppointmentDateChange}
                     required
                   />
 
@@ -1488,11 +1572,39 @@ return (
                 {isSubmitting ? 'SENDING...' : 'REQUEST APPOINTMENT →'}
               </button>
 
-              {appointmentStatus && (
-                <p className="appointment-note">
-                  {appointmentStatus}
-                </p>
-              )}
+            {appointmentStatus && (
+              <div
+                className={
+                  appointmentStatus.startsWith('SUCCESS:')
+                    ? 'appointment-status appointment-status-success'
+                    : 'appointment-status appointment-status-error'
+                }
+              >
+                <div className="appointment-status-icon">
+                  {appointmentStatus.startsWith('SUCCESS:') ? '✓' : '!'}
+                </div>
+
+                <div className="appointment-status-content">
+                  <strong>
+                    {appointmentStatus.startsWith('SUCCESS:')
+                      ? 'REQUEST RECEIVED'
+                      : appointmentStatus.toLowerCase().includes('fully booked')
+                      ? 'FULLY BOOKED'
+                      : appointmentStatus.toLowerCase().includes('holiday')
+                      ? 'HOLIDAY CLOSURE'
+                      : appointmentStatus.toLowerCase().includes('shop will be closed')
+                      ? 'SHOP CLOSED'
+                      : 'APPOINTMENT UNAVAILABLE'}
+                  </strong>
+
+                  <p>
+                    {appointmentStatus
+                      .replace('ERROR: ', '')
+                      .replace('SUCCESS: ', '')}
+                  </p>
+                </div>
+              </div>
+            )}
 
             </form>
 
