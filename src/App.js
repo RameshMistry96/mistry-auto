@@ -39,6 +39,51 @@ function App() {
 
 const [selectedService, setSelectedService] = useState(null);
 
+const [services, setServices] = useState([]);
+const [servicesLoading, setServicesLoading] = useState(true);
+
+// ================= SERVICES & PRICING MENU =================
+
+const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
+const [pricingModalOpen, setPricingModalOpen] = useState(false);
+
+useEffect(() => {
+
+  const loadServices = async () => {
+
+    try {
+
+      const response = await fetch(
+        'http://localhost:5000/api/services'
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error('Unable to load services.');
+      }
+
+      setServices(data.services || []);
+
+    } catch (error) {
+
+      console.error(
+        'Unable to load services:',
+        error
+      );
+
+    } finally {
+
+      setServicesLoading(false);
+
+    }
+
+  };
+
+  loadServices();
+
+}, []);
+
 // ================= GALLERY =================
 
 const [galleryFilter, setGalleryFilter] = useState('ALL');
@@ -313,7 +358,45 @@ return (
           <nav className="nav-links">
 
             <a href="#home" className="active">HOME</a>
-            <a href="#services">SERVICES</a>
+            <div className="nav-services-dropdown">
+
+            <button
+              type="button"
+              className="nav-services-button"
+              onClick={() => setServicesMenuOpen(!servicesMenuOpen)}
+            >
+              SERVICES
+              <span className={`nav-services-arrow ${servicesMenuOpen ? 'open' : ''}`}>
+                ▾
+              </span>
+            </button>
+
+            {servicesMenuOpen && (
+              <div className="nav-services-menu">
+
+                <a
+                  href="#services"
+                  onClick={() => setServicesMenuOpen(false)}
+                >
+                  <span>OUR SERVICES</span>
+                  <small>View all repair services</small>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setServicesMenuOpen(false);
+                    setPricingModalOpen(true);
+                  }}
+                >
+                  <span>SERVICES & PRICING</span>
+                  <small>View services and prices</small>
+                </button>
+
+              </div>
+            )}
+
+          </div>
             <a href="#about">ABOUT US</a>
             <a href="#gallery">GALLERY</a>
             <a href="#reviews">REVIEWS</a>
@@ -328,6 +411,121 @@ return (
         </div>
 
       </header>
+
+      {/* ================= SERVICES & PRICING POPUP ================= */}
+
+        {pricingModalOpen && (
+
+          <div className="pricing-modal">
+
+            <div
+              className="pricing-modal-overlay"
+              onClick={() => setPricingModalOpen(false)}
+            ></div>
+
+            <div className="pricing-modal-content">
+
+              <button
+                type="button"
+                className="pricing-modal-close"
+                onClick={() => setPricingModalOpen(false)}
+                aria-label="Close services and pricing"
+              >
+                ×
+              </button>
+
+              <div className="pricing-modal-header">
+
+                <span>OUR SERVICES</span>
+
+                <h2>SERVICES & PRICING</h2>
+
+                <div className="pricing-modal-line"></div>
+
+                <p>
+                  Explore our automotive services and current pricing.
+                </p>
+
+              </div>
+
+
+              <div className="pricing-service-list">
+
+                {servicesLoading ? (
+
+                  <div className="pricing-loading">
+                    Loading services...
+                  </div>
+
+                ) : (
+
+                  services.map((service) => (
+
+                    <div
+                      className="pricing-service-item"
+                      key={service.id}
+                    >
+
+                      <div className="pricing-service-info">
+
+                        <h3>
+                          {service.name}
+                        </h3>
+
+                        {service.description && (
+                          <p>
+                            {service.description}
+                          </p>
+                        )}
+
+                      </div>
+
+
+                      <div className="pricing-service-price">
+
+                        {service.price ? (
+                          <>
+                            <small>PRICE</small>
+
+                            <strong>
+                              {service.price}
+                            </strong>
+                          </>
+                        ) : (
+                          <span>CONTACT US</span>
+                        )}
+
+                      </div>
+
+                    </div>
+
+                  ))
+
+                )}
+
+              </div>
+
+
+              <div className="pricing-modal-footer">
+
+                <p>
+                  Prices may vary depending on vehicle and required service.
+                </p>
+
+                <a
+                  href="#appointment"
+                  onClick={() => setPricingModalOpen(false)}
+                >
+                  BOOK APPOINTMENT →
+                </a>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        )}
 
 
       {/* ================= HERO ================= */}
@@ -616,6 +814,41 @@ return (
               })
             }
           />
+
+          {/* ================= ADMIN ADDED SERVICES ================= */}
+
+        {services
+          .filter((service) => service.id > 10)
+          .map((service) => (
+
+            <ServiceCard
+              key={service.id}
+                image={
+                  service.image ||
+                  '/images/mistry-logo.png'
+                }
+              title={service.name.toUpperCase()}
+              description={
+                service.description ||
+                'Professional automotive service from Mistry Auto Repair Center.'
+              }
+              price={service.price}
+              onLearnMore={() =>
+                setSelectedService({
+                  title: service.name.toUpperCase(),
+                  image:
+                    service.image ||
+                    '/images/mistry-logo.png',
+                  description:
+                    service.description ||
+                    'Professional automotive service from Mistry Auto Repair Center.',
+                  price: service.price,
+                  includes: []
+                })
+              }
+            />
+
+          ))}
 
         </div>
 
@@ -1742,9 +1975,9 @@ function ServiceCard({
   image,
   title,
   description,
+  price,
   onLearnMore
 }) {
-
   return (
 
     <div className="service-card">
@@ -1760,11 +1993,17 @@ function ServiceCard({
 
       <div className="service-content">
 
-        <h3>{title}</h3>
+          <h3>{title}</h3>
 
-        <p>{description}</p>
+          <p>{description}</p>
 
-        <button
+          {price && (
+            <div className="service-card-price">
+              {price}
+            </div>
+          )}
+
+          <button
           type="button"
           className="service-learn-more"
           onClick={onLearnMore}

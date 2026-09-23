@@ -16,6 +16,27 @@ function Admin() {
   const [dashboardError, setDashboardError] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
   const [archivingId, setArchivingId] = useState(null);
+
+  // ================= SERVICES & PRICING =================
+
+const [services, setServices] = useState([]);
+const [servicesLoading, setServicesLoading] = useState(false);
+const [servicesMessage, setServicesMessage] = useState('');
+
+const [serviceEditorOpen, setServiceEditorOpen] = useState(false);
+const [editingService, setEditingService] = useState(null);
+
+const [serviceForm, setServiceForm] = useState({
+  name: '',
+  description: '',
+  price: '',
+  image: '',
+  active: true
+});
+
+const [savingService, setSavingService] = useState(false);
+const [deletingServiceId, setDeletingServiceId] = useState(null);
+
   // ================= BLOCK DATES =================
 
 const [blockedDates, setBlockedDates] = useState([]);
@@ -29,6 +50,9 @@ const [blockDateMessage, setBlockDateMessage] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [sortBy, setSortBy] = useState('NEWEST');
   const [appointmentView, setAppointmentView] = useState('ACTIVE');
+  // ================= ADMIN NAVIGATION =================
+const [adminSection, setAdminSection] = useState('dashboard');
+  
 
   // ================= ADMIN LOGIN =================
 
@@ -115,12 +139,59 @@ const [blockDateMessage, setBlockDateMessage] = useState('');
     }
   };
 
+  // ================= LOAD SERVICES =================
+
+const loadServices = async () => {
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  if (!token) {
+    setIsLoggedIn(false);
+    return;
+  }
+
+  setServicesLoading(true);
+  setServicesMessage('');
+
+  try {
+    const response = await fetch(
+      'http://localhost:5000/api/admin/services',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.status === 401 || response.status === 403) {
+      sessionStorage.removeItem('mistryAdminToken');
+      setIsLoggedIn(false);
+      return;
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || 'Unable to load services.'
+      );
+    }
+
+    setServices(data.services || []);
+
+  } catch (error) {
+    setServicesMessage(error.message);
+  } finally {
+    setServicesLoading(false);
+  }
+};
+
   // ================= LOAD AFTER LOGIN =================
 
   useEffect(() => {
     if (isLoggedIn) {
       loadAppointments();
       loadBlockedDates();
+      loadServices();
     }
   }, [isLoggedIn]);
 
@@ -349,6 +420,271 @@ const handleUnblockDate = async (id) => {
   }
 };
 
+// ================= SERVICE EDITOR =================
+
+const openAddService = () => {
+  setEditingService(null);
+
+  setServiceForm({
+    name: '',
+    description: '',
+    price: '',
+    image: '',
+    active: true
+  });
+
+  setServicesMessage('');
+  setServiceEditorOpen(true);
+};
+
+
+const openEditService = (service) => {
+  setEditingService(service);
+
+  setServiceForm({
+    name: service.name || '',
+    description: service.description || '',
+    price: service.price || '',
+    image: service.image || '',
+    active: Number(service.active) === 1
+  });
+
+  setServicesMessage('');
+  setServiceEditorOpen(true);
+};
+
+
+const closeServiceEditor = () => {
+  if (savingService) {
+    return;
+  }
+
+  setServiceEditorOpen(false);
+  setEditingService(null);
+
+  setServiceForm({
+    name: '',
+    description: '',
+    price: '',
+    image: '',
+    active: true
+  });
+};
+
+
+const handleServiceFormChange = (e) => {
+  const { name, value, type, checked } = e.target;
+
+  setServiceForm((current) => ({
+    ...current,
+    [name]: type === 'checkbox' ? checked : value
+  }));
+};
+
+// ================= SAVE SERVICE =================
+
+const handleSaveService = async () => {
+  if (!serviceForm.name.trim()) {
+    setServicesMessage('Please enter a service name.');
+    return;
+  }
+
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  if (!token) {
+    setIsLoggedIn(false);
+    return;
+  }
+
+  setSavingService(true);
+  setServicesMessage('');
+
+  try {
+    const isEditing = !!editingService;
+
+    const url = isEditing
+      ? `http://localhost:5000/api/admin/services/${editingService.id}`
+      : 'http://localhost:5000/api/admin/services';
+
+    const response = await fetch(url, {
+      method: isEditing ? 'PATCH' : 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+
+      body: JSON.stringify({
+        name: serviceForm.name.trim(),
+        description: serviceForm.description.trim(),
+        price: serviceForm.price.trim(),
+        image: serviceForm.image.trim(),
+        active: serviceForm.active
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401 || response.status === 403) {
+      sessionStorage.removeItem('mistryAdminToken');
+      setIsLoggedIn(false);
+      return;
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || 'Unable to save service.'
+      );
+    }
+
+    setServiceEditorOpen(false);
+    setEditingService(null);
+
+    setServiceForm({
+      name: '',
+      description: '',
+      price: '',
+      image: '',
+      active: true
+    });
+
+    await loadServices();
+
+    setServicesMessage(
+      isEditing
+        ? 'Service updated successfully.'
+        : 'New service added successfully.'
+    );
+
+  } catch (error) {
+    setServicesMessage(error.message);
+
+  } finally {
+    setSavingService(false);
+  }
+};
+
+// ================= TOGGLE SERVICE VISIBILITY =================
+
+const handleToggleService = async (service) => {
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  if (!token) {
+    setIsLoggedIn(false);
+    return;
+  }
+
+  setServicesMessage('');
+
+  try {
+    const newActiveStatus =
+      Number(service.active) === 1 ? false : true;
+
+    const response = await fetch(
+      `http://localhost:5000/api/admin/services/${service.id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: service.name,
+          description: service.description || '',
+          price: service.price || '',
+          active: newActiveStatus
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.status === 401 || response.status === 403) {
+      sessionStorage.removeItem('mistryAdminToken');
+      setIsLoggedIn(false);
+      return;
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || 'Unable to update service.'
+      );
+    }
+
+    await loadServices();
+
+    setServicesMessage(
+      newActiveStatus
+        ? 'Service is now visible on the website.'
+        : 'Service is now hidden from the website.'
+    );
+
+  } catch (error) {
+    setServicesMessage(error.message);
+  }
+};
+
+
+// ================= DELETE SERVICE =================
+
+const handleDeleteService = async (service) => {
+  const confirmed = window.confirm(
+    `Delete "${service.name}"?\n\nThis service will be permanently removed.`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const token = sessionStorage.getItem('mistryAdminToken');
+
+  if (!token) {
+    setIsLoggedIn(false);
+    return;
+  }
+
+  setDeletingServiceId(service.id);
+  setServicesMessage('');
+
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/admin/services/${service.id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.status === 401 || response.status === 403) {
+      sessionStorage.removeItem('mistryAdminToken');
+      setIsLoggedIn(false);
+      return;
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || 'Unable to delete service.'
+      );
+    }
+
+    await loadServices();
+
+    setServicesMessage(
+      `"${service.name}" deleted successfully.`
+    );
+
+  } catch (error) {
+    setServicesMessage(error.message);
+
+  } finally {
+    setDeletingServiceId(null);
+  }
+};
+
   // ================= LOGOUT =================
 
   const handleLogout = () => {
@@ -507,26 +843,157 @@ const handleUnblockDate = async (id) => {
       <div className="admin-page admin-dashboard-page">
 
         <div className="admin-dashboard">
+          {/* ================= ADMIN SIDEBAR ================= */}
+
+<aside className="admin-sidebar">
+
+  <div className="admin-sidebar-brand">
+
+    <img
+      src="/images/mistry-logo.png"
+      alt="Mistry Auto Repair Center"
+    />
+
+    <div>
+      <strong>MISTRY</strong>
+      <span>ADMIN PORTAL</span>
+    </div>
+
+  </div>
+
+
+  <nav className="admin-sidebar-nav">
+
+    <button
+      type="button"
+      className={adminSection === 'dashboard' ? 'active' : ''}
+      onClick={() => setAdminSection('dashboard')}
+    >
+      <span className="admin-nav-icon">⌂</span>
+
+      <div>
+        <strong>Dashboard</strong>
+        <small>Overview & activity</small>
+      </div>
+    </button>
+
+
+    <button
+      type="button"
+      className={adminSection === 'appointments' ? 'active' : ''}
+      onClick={() => setAdminSection('appointments')}
+    >
+      <span className="admin-nav-icon">▣</span>
+
+      <div>
+        <strong>Appointments</strong>
+        <small>Manage bookings</small>
+      </div>
+
+      {activeAppointments.length > 0 && (
+        <span className="admin-nav-count">
+          {activeAppointments.length}
+        </span>
+      )}
+    </button>
+
+
+    <button
+      type="button"
+      className={adminSection === 'services' ? 'active' : ''}
+      onClick={() => setAdminSection('services')}
+    >
+      <span className="admin-nav-icon">◆</span>
+
+      <div>
+        <strong>Services & Pricing</strong>
+        <small>Website services</small>
+      </div>
+    </button>
+
+
+    <button
+      type="button"
+      className={adminSection === 'availability' ? 'active' : ''}
+      onClick={() => setAdminSection('availability')}
+    >
+      <span className="admin-nav-icon">▦</span>
+
+      <div>
+        <strong>Availability</strong>
+        <small>Shop schedule</small>
+      </div>
+    </button>
+
+  </nav>
+
+
+  <div className="admin-sidebar-bottom">
+
+    <a
+      href="/"
+      target="_blank"
+      rel="noreferrer"
+      className="admin-sidebar-website"
+    >
+      <span>↗</span>
+
+      <div>
+        <strong>View Website</strong>
+        <small>Open customer site</small>
+      </div>
+    </a>
+
+
+    <button
+      type="button"
+      className="admin-sidebar-logout"
+      onClick={handleLogout}
+    >
+      <span>⇥</span>
+
+      <div>
+        <strong>Logout</strong>
+        <small>End admin session</small>
+      </div>
+    </button>
+
+  </div>
+
+</aside>
+
+          {/* ================= ADMIN MAIN CONTENT ================= */}
+
+          <main className="admin-main-content">
 
           <div className="admin-dashboard-header">
 
             <div className="admin-dashboard-brand">
-
-              <img
-                src="/images/mistry-logo.png"
-                alt="Mistry Auto Repair Center"
-                className="admin-dashboard-logo"
-              />
 
               <div>
                 <div className="admin-label">
                   ADMIN DASHBOARD
                 </div>
 
-                <h1>Appointments</h1>
+                <h1>
+                  {adminSection === 'dashboard' && 'Dashboard'}
+                  {adminSection === 'appointments' && 'Appointments'}
+                  {adminSection === 'services' && 'Services & Pricing'}
+                  {adminSection === 'availability' && 'Availability'}
+                </h1>
 
                 <p>
-                  Manage customer appointment requests.
+                  {adminSection === 'dashboard' &&
+                    'Overview of your garage activity.'}
+
+                  {adminSection === 'appointments' &&
+                    'Manage customer appointment requests.'}
+
+                  {adminSection === 'services' &&
+                    'Manage services, pricing and website visibility.'}
+
+                  {adminSection === 'availability' &&
+                    'Manage unavailable shop dates and appointment availability.'}
                 </p>
               </div>
 
@@ -544,20 +1011,14 @@ const handleUnblockDate = async (id) => {
                   ? 'LOADING...'
                   : 'REFRESH'}
               </button>
-
-              <button
-                type="button"
-                className="admin-logout-button"
-                onClick={handleLogout}
-              >
-                LOGOUT
-              </button>
-
+              
             </div>
 
           </div>
 
           {/* ================= SUMMARY ================= */}
+
+          {adminSection === 'dashboard' && (
 
           <div className="admin-dashboard-summary">
 
@@ -621,7 +1082,194 @@ const handleUnblockDate = async (id) => {
 
           </div>
 
+          )}      
+
+          {/* ================= SERVICES & PRICING ================= */}
+
+          {adminSection === 'services' && (
+
+          <div className="admin-services-section">
+
+            <div className="admin-services-header">
+
+              <div>
+                <span className="admin-section-label">
+                  WEBSITE MANAGEMENT
+                </span>
+
+                <h2>Services & Pricing</h2>
+
+                <p>
+                  Manage the services and prices displayed on your website.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="admin-add-service-button"
+                onClick={openAddService}
+              >
+                <span>+</span>
+                ADD NEW SERVICE
+              </button>
+
+            </div>
+
+
+            {servicesMessage && (
+              <div className="admin-services-message">
+                {servicesMessage}
+              </div>
+            )}
+
+
+            {servicesLoading ? (
+
+              <div className="admin-services-empty">
+                Loading services...
+              </div>
+
+            ) : services.length === 0 ? (
+
+              <div className="admin-services-empty">
+                <h3>No Services Found</h3>
+                <p>Add your first service to get started.</p>
+              </div>
+
+            ) : (
+
+              <div className="admin-services-list">
+
+                {services.map((service) => (
+
+                  <div
+                    className={`admin-service-row ${
+                      Number(service.active) === 1
+                        ? ''
+                        : 'admin-service-hidden'
+                    }`}
+                    key={service.id}
+                  >
+
+                    <div className="admin-service-main">
+
+                      <div className="admin-service-image">
+
+                        {service.image ? (
+                          <img
+                            src={service.image}
+                            alt={service.name}
+                          />
+                        ) : (
+                          <span>🔧</span>
+                        )}
+
+                      </div>
+
+                      <div className="admin-service-info">
+
+                        <h3>{service.name}</h3>
+
+                        <p>
+                          {service.description ||
+                            'No description added.'}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="admin-service-price">
+
+                      <span>PRICE</span>
+
+                      <strong>
+                        {service.price || 'Not Set'}
+                      </strong>
+
+                    </div>
+
+
+                    <div className="admin-service-visibility">
+
+                      <span
+                        className={`admin-service-status ${
+                          Number(service.active) === 1
+                            ? 'active'
+                            : 'hidden'
+                        }`}
+                      >
+                        <i></i>
+
+                        {Number(service.active) === 1
+                          ? 'ACTIVE'
+                          : 'HIDDEN'}
+                      </span>
+
+                    </div>
+
+
+                    <div className="admin-service-actions">
+
+                      <button
+                        type="button"
+                        className="admin-service-edit-button"
+                        onClick={() =>
+                          openEditService(service)
+                        }
+                      >
+                        EDIT
+                      </button>
+
+                      <button
+                        type="button"
+                        className={
+                          Number(service.active) === 1
+                            ? 'admin-service-hide-button'
+                            : 'admin-service-show-button'
+                        }
+                        onClick={() =>
+                          handleToggleService(service)
+                        }
+                      >
+                        {Number(service.active) === 1
+                          ? 'HIDE'
+                          : 'SHOW'}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="admin-service-delete-button"
+                        disabled={
+                          deletingServiceId === service.id
+                        }
+                        onClick={() =>
+                          handleDeleteService(service)
+                        }
+                      >
+                        {deletingServiceId === service.id
+                          ? '...'
+                          : 'DELETE'}
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+              </div>
+
+            )}
+
+          </div>
+
+          )}
+
           {/* ================= APPOINTMENT AVAILABILITY ================= */}
+
+          {adminSection === 'availability' && (
 
           <div className="admin-block-date-section">
 
@@ -696,7 +1344,12 @@ const handleUnblockDate = async (id) => {
 
           </div>
 
+        )}
+
           {/* ================= ACTIVE / ARCHIVED VIEW ================= */}
+
+          {adminSection === 'appointments' && (
+          <>
 
           <div className="admin-view-tabs">
 
@@ -1136,9 +1789,209 @@ const handleUnblockDate = async (id) => {
 
           )}
 
-        </div>
+          </>
+        )}
+
+          {/* ================= SERVICE EDITOR MODAL ================= */}
+
+          {serviceEditorOpen && (
+
+            <div
+              className="admin-service-modal-overlay"
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) {
+                  closeServiceEditor();
+                }
+              }}
+            >
+
+              <div className="admin-service-modal">
+
+                <div className="admin-service-modal-header">
+
+                  <div>
+                    <span className="admin-section-label">
+                      {editingService
+                        ? 'EDIT SERVICE'
+                        : 'NEW SERVICE'}
+                    </span>
+
+                    <h2>
+                      {editingService
+                        ? 'Update Service'
+                        : 'Add New Service'}
+                    </h2>
+
+                    <p>
+                      {editingService
+                        ? 'Update the service information shown on your website.'
+                        : 'Create a new service for your website.'}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="admin-service-modal-close"
+                    onClick={closeServiceEditor}
+                    disabled={savingService}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+
+                </div>
+
+
+                <div className="admin-service-modal-body">
+
+                  <div className="admin-service-form-field">
+
+                    <label>SERVICE NAME *</label>
+
+                    <input
+                      type="text"
+                      name="name"
+                      value={serviceForm.name}
+                      onChange={handleServiceFormChange}
+                      placeholder="Example: Oil Change"
+                      autoFocus
+                    />
+
+                  </div>
+
+
+                  <div className="admin-service-form-field">
+
+                    <label>DESCRIPTION</label>
+
+                    <textarea
+                      name="description"
+                      value={serviceForm.description}
+                      onChange={handleServiceFormChange}
+                      placeholder="Short description of this service"
+                      rows="4"
+                    />
+
+                  </div>
+
+
+                  <div className="admin-service-form-grid">
+
+                    <div className="admin-service-form-field">
+
+                      <label>PRICE</label>
+
+                      <input
+                        type="text"
+                        name="price"
+                        value={serviceForm.price}
+                        onChange={handleServiceFormChange}
+                        placeholder="Example: $79.99"
+                      />
+
+                      <small>
+                        Example: $79.99, From $99, or Call for Price
+                      </small>
+
+                    </div>
+
+
+                    <div className="admin-service-form-field">
+
+                      <label>IMAGE PATH</label>
+
+                      <input
+                        type="text"
+                        name="image"
+                        value={serviceForm.image}
+                        onChange={handleServiceFormChange}
+                        placeholder="/images/services/oil-change.png"
+                        disabled={!!editingService}
+                      />
+
+                      <small>
+                        Website service image.
+                      </small>
+
+                    </div>
+
+                  </div>
+
+
+                  {editingService && (
+
+                    <div className="admin-service-visibility-card">
+
+                      <div>
+                        <strong>Website Visibility</strong>
+
+                        <span>
+                          {serviceForm.active
+                            ? 'Customers can see this service.'
+                            : 'This service is hidden from customers.'}
+                        </span>
+                      </div>
+
+
+                      <label className="admin-service-switch">
+
+                        <input
+                          type="checkbox"
+                          name="active"
+                          checked={serviceForm.active}
+                          onChange={handleServiceFormChange}
+                        />
+
+                        <span className="admin-service-switch-slider"></span>
+
+                      </label>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+
+                <div className="admin-service-modal-footer">
+
+                  <button
+                    type="button"
+                    className="admin-service-cancel-button"
+                    onClick={closeServiceEditor}
+                    disabled={savingService}
+                  >
+                    CANCEL
+                  </button>
+
+                  <button
+                    type="button"
+                    className="admin-service-save-button"
+                    onClick={handleSaveService}
+                    disabled={
+                      savingService ||
+                      !serviceForm.name.trim()
+                    }
+                  >
+                    {savingService
+                      ? 'SAVING...'
+                      : editingService
+                        ? 'SAVE CHANGES'
+                        : 'ADD SERVICE'}
+                  </button>
+
+                </div>
+              </div>
+
+            </div>
+
+          )}
+
+        </main>
 
       </div>
+
+    </div>
     );
   }
 

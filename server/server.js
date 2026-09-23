@@ -102,6 +102,155 @@ db.run(`
   }
 });
 
+// ================= SERVICES TABLE =================
+
+db.run(`
+  CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    price TEXT,
+    image TEXT,
+    active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`, (err) => {
+  if (err) {
+    console.error(
+      'Services table error:',
+      err.message
+    );
+  } else {
+    console.log('Services table ready.');
+  }
+});
+
+// ================= DEFAULT SERVICES =================
+
+db.get(`SELECT COUNT(*) AS total FROM services`, [], (err, row) => {
+  if (err) {
+    console.error('Service count error:', err.message);
+    return;
+  }
+
+  if (row.total > 0) {
+    return;
+  }
+
+  const defaultServices = [
+    {
+      name: 'Safety Inspection',
+      description: 'Professional vehicle safety inspection and assessment.',
+      price: '',
+      image: '/images/services/safety.png'
+    },
+    {
+      name: 'Oil Change',
+      description: 'Routine oil and filter service to help protect your engine.',
+      price: '',
+      image: '/images/services/oil-change.png'
+    },
+    {
+      name: 'Brake Job',
+      description: 'Brake inspection, maintenance and repair services.',
+      price: '',
+      image: '/images/services/brake-job.png'
+    },
+    {
+      name: 'Tune Up',
+      description: 'Preventive maintenance to help keep your vehicle running smoothly.',
+      price: '',
+      image: '/images/services/tune-up.png'
+    },
+    {
+      name: 'Suspension',
+      description: 'Suspension inspection and repair for a smoother, safer ride.',
+      price: '',
+      image: '/images/services/suspension.png'
+    },
+    {
+      name: 'Tire Service',
+      description: 'Tire inspection, maintenance and related services.',
+      price: '',
+      image: '/images/services/tire-service.png'
+    },
+    {
+      name: 'Exhaust Repair',
+      description: 'Inspection and repair of exhaust system components.',
+      price: '',
+      image: '/images/services/exhaust-repair.png'
+    },
+    {
+      name: 'Rust Proofing',
+      description: 'Vehicle rust protection to help reduce corrosion.',
+      price: '',
+      image: '/images/services/rust-proofing.png'
+    },
+    {
+      name: 'A/C & Heating',
+      description: 'Heating and air conditioning diagnosis and repair.',
+      price: '',
+      image: '/images/services/ac-heating.png'
+    },
+    {
+      name: 'Electrical Repair',
+      description: 'Diagnosis and repair of common automotive electrical problems.',
+      price: '',
+      image: '/images/services/electrical-repair.png'
+    }
+  ];
+
+  const sql = `
+    INSERT INTO services (
+      name,
+      description,
+      price,
+      image
+    )
+    VALUES (?, ?, ?, ?)
+  `;
+
+  defaultServices.forEach((service) => {
+    db.run(sql, [
+      service.name,
+      service.description,
+      service.price,
+      service.image
+    ]);
+  });
+
+  console.log('Default services added.');
+});
+
+// ================= PUBLIC SERVICES API =================
+
+app.get('/api/services', (req, res) => {
+  db.all(
+    `
+      SELECT id, name, description, price, image
+      FROM services
+      WHERE active = 1
+      ORDER BY id ASC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('Services load error:', err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to load services.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        services: rows
+      });
+    }
+  );
+});
+
 // ================= TEST ROUTE =================
 
 app.get('/api/test', (req, res) => {
@@ -1285,6 +1434,195 @@ const requireAdmin = (req, res, next) => {
     });
   }
 };
+
+// ================= ADMIN SERVICES API =================
+
+// GET ALL SERVICES
+
+app.get('/api/admin/services', requireAdmin, (req, res) => {
+  db.all(
+    `
+      SELECT id, name, description, price, image, active
+      FROM services
+      ORDER BY id ASC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('Admin services load error:', err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to load services.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        services: rows
+      });
+    }
+  );
+});
+
+// UPDATE SERVICE
+
+app.patch('/api/admin/services/:id', requireAdmin, (req, res) => {
+  const { id } = req.params;
+
+  const {
+    name,
+    description,
+    price,
+    active
+  } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: 'Service name is required.'
+    });
+  }
+
+  const activeValue =
+    active === false || active === 0 ? 0 : 1;
+
+  db.run(
+    `
+      UPDATE services
+      SET
+        name = ?,
+        description = ?,
+        price = ?,
+        active = ?
+      WHERE id = ?
+    `,
+    [
+      name.trim(),
+      description || '',
+      price || '',
+      activeValue,
+      id
+    ],
+    function (err) {
+      if (err) {
+        console.error(
+          'Service update error:',
+          err.message
+        );
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to update service.'
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Service not found.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Service updated successfully.'
+      });
+    }
+  );
+});
+
+// ADD NEW SERVICE
+
+app.post('/api/admin/services', requireAdmin, (req, res) => {
+  const {
+    name,
+    description,
+    price,
+    image
+  } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: 'Service name is required.'
+    });
+  }
+
+  db.run(
+    `
+      INSERT INTO services (
+        name,
+        description,
+        price,
+        image,
+        active
+      )
+      VALUES (?, ?, ?, ?, 1)
+    `,
+    [
+      name.trim(),
+      description || '',
+      price || '',
+      image || ''
+    ],
+    function (err) {
+      if (err) {
+        console.error('Add service error:', err.message);
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to add service.'
+        });
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: 'Service added successfully.',
+        id: this.lastID
+      });
+    }
+  );
+});
+
+// DELETE SERVICE
+
+app.delete('/api/admin/services/:id', requireAdmin, (req, res) => {
+  const { id } = req.params;
+
+  db.run(
+    `
+      DELETE FROM services
+      WHERE id = ?
+    `,
+    [id],
+    function (err) {
+      if (err) {
+        console.error(
+          'Delete service error:',
+          err.message
+        );
+
+        return res.status(500).json({
+          success: false,
+          message: 'Unable to delete service.'
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Service not found.'
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: 'Service deleted successfully.'
+      });
+    }
+  );
+});
 
 // ================= BLOCKED DATES API =================
 
