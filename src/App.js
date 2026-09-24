@@ -46,6 +46,19 @@ const [servicesLoading, setServicesLoading] = useState(true);
 
 const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
 const [pricingModalOpen, setPricingModalOpen] = useState(false);
+const [activePricingIndex, setActivePricingIndex] = useState(0);
+
+const showPreviousPricingService = () => {
+  setActivePricingIndex((current) =>
+    current === 0 ? services.length - 1 : current - 1
+  );
+};
+
+const showNextPricingService = () => {
+  setActivePricingIndex((current) =>
+    current === services.length - 1 ? 0 : current + 1
+  );
+};
 
 useEffect(() => {
 
@@ -386,6 +399,7 @@ return (
                   type="button"
                   onClick={() => {
                     setServicesMenuOpen(false);
+                    setActivePricingIndex(0);
                     setPricingModalOpen(true);
                   }}
                 >
@@ -526,6 +540,152 @@ return (
           </div>
 
         )}
+
+        {/* ================= SERVICES & PRICING POPUP ================= */}
+
+            {pricingModalOpen && (
+              <div className="pricing-modal">
+
+                <div
+                  className="pricing-modal-overlay"
+                  onClick={() => setPricingModalOpen(false)}
+                ></div>
+
+                <div className="pricing-stack-modal">
+
+                  <button
+                    type="button"
+                    className="pricing-stack-close"
+                    onClick={() => setPricingModalOpen(false)}
+                    aria-label="Close services and pricing"
+                  >
+                    ×
+                  </button>
+
+                  <div className="pricing-stack-header">
+                    <span>MISTRY AUTO SERVICE</span>
+                    <h2>SERVICES & PRICING</h2>
+                    <p>
+                      Professional automotive care for your vehicle.
+                    </p>
+                  </div>
+
+                  {servicesLoading ? (
+
+                    <div className="pricing-stack-loading">
+                      Loading services...
+                    </div>
+
+                  ) : services.length > 0 ? (
+
+                    <>
+                      <div className="pricing-card-stage">
+
+                        <div className="pricing-card-back pricing-card-back-two"></div>
+                        <div className="pricing-card-back pricing-card-back-one"></div>
+
+                        <div
+                          className="pricing-main-card"
+                          key={services[activePricingIndex]?.id}
+                        >
+
+                          <div className="pricing-card-number">
+                            {String(activePricingIndex + 1).padStart(2, '0')}
+                          </div>
+
+                          <div className="pricing-card-content">
+
+                            <span className="pricing-card-label">
+                              AUTO SERVICE
+                            </span>
+
+                            <h3>
+                              {services[activePricingIndex]?.name}
+                            </h3>
+
+                            <p>
+                              {services[activePricingIndex]?.description ||
+                                'Professional automotive service from Mistry Auto Repair Center.'}
+                            </p>
+
+                            <div className="pricing-card-bottom">
+
+                              <div className="pricing-card-price">
+                                <small>PRICE</small>
+
+                                {services[activePricingIndex]?.price ? (
+                                  <strong>
+                                    {services[activePricingIndex].price}
+                                  </strong>
+                                ) : (
+                                  <strong>CONTACT US</strong>
+                                )}
+                              </div>
+
+                              <a
+                                href="#appointment"
+                                onClick={() => setPricingModalOpen(false)}
+                              >
+                                BOOK APPOINTMENT →
+                              </a>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                      <div className="pricing-stack-controls">
+
+                        <button
+                          type="button"
+                          onClick={showPreviousPricingService}
+                          aria-label="Previous service"
+                        >
+                          ←
+                        </button>
+
+                        <div className="pricing-stack-progress">
+                          <strong>
+                            {String(activePricingIndex + 1).padStart(2, '0')}
+                          </strong>
+
+                          <span>/</span>
+
+                          <small>
+                            {String(services.length).padStart(2, '0')}
+                          </small>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={showNextPricingService}
+                          aria-label="Next service"
+                        >
+                          →
+                        </button>
+
+                      </div>
+                    </>
+
+                  ) : (
+
+                    <div className="pricing-stack-loading">
+                      No services available.
+                    </div>
+
+                  )}
+
+                  <div className="pricing-stack-note">
+                    Prices may vary depending on vehicle and required service.
+                  </div>
+
+                </div>
+
+              </div>
+            )}
 
 
       {/* ================= HERO ================= */}
