@@ -47,6 +47,7 @@ const [servicesLoading, setServicesLoading] = useState(true);
 const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
 const [pricingModalOpen, setPricingModalOpen] = useState(false);
 const [activePricingIndex, setActivePricingIndex] = useState(0);
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 const showPreviousPricingService = () => {
   setActivePricingIndex((current) =>
@@ -368,9 +369,26 @@ return (
             className="nav-logo"
           />
 
-          <nav className="nav-links">
+          <button
+            type="button"
+            className={`mobile-menu-button ${mobileMenuOpen ? 'open' : ''}`}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-            <a href="#home" className="active">HOME</a>
+          <nav className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+
+            <a
+              href="#home"
+              className="active"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              HOME
+            </a>
             <div className="nav-services-dropdown">
 
             <button
@@ -387,18 +405,22 @@ return (
             {servicesMenuOpen && (
               <div className="nav-services-menu">
 
-                <a
-                  href="#services"
-                  onClick={() => setServicesMenuOpen(false)}
-                >
-                  <span>OUR SERVICES</span>
-                  <small>View all repair services</small>
-                </a>
+                  <a
+                    href="#services"
+                    onClick={() => {
+                      setServicesMenuOpen(false);
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <span>OUR SERVICES</span>
+                    <small>View all repair services</small>
+                  </a>
 
                 <button
                   type="button"
                   onClick={() => {
                     setServicesMenuOpen(false);
+                    setMobileMenuOpen(false);
                     setActivePricingIndex(0);
                     setPricingModalOpen(true);
                   }}
@@ -425,121 +447,6 @@ return (
         </div>
 
       </header>
-
-      {/* ================= SERVICES & PRICING POPUP ================= */}
-
-        {pricingModalOpen && (
-
-          <div className="pricing-modal">
-
-            <div
-              className="pricing-modal-overlay"
-              onClick={() => setPricingModalOpen(false)}
-            ></div>
-
-            <div className="pricing-modal-content">
-
-              <button
-                type="button"
-                className="pricing-modal-close"
-                onClick={() => setPricingModalOpen(false)}
-                aria-label="Close services and pricing"
-              >
-                ×
-              </button>
-
-              <div className="pricing-modal-header">
-
-                <span>OUR SERVICES</span>
-
-                <h2>SERVICES & PRICING</h2>
-
-                <div className="pricing-modal-line"></div>
-
-                <p>
-                  Explore our automotive services and current pricing.
-                </p>
-
-              </div>
-
-
-              <div className="pricing-service-list">
-
-                {servicesLoading ? (
-
-                  <div className="pricing-loading">
-                    Loading services...
-                  </div>
-
-                ) : (
-
-                  services.map((service) => (
-
-                    <div
-                      className="pricing-service-item"
-                      key={service.id}
-                    >
-
-                      <div className="pricing-service-info">
-
-                        <h3>
-                          {service.name}
-                        </h3>
-
-                        {service.description && (
-                          <p>
-                            {service.description}
-                          </p>
-                        )}
-
-                      </div>
-
-
-                      <div className="pricing-service-price">
-
-                        {service.price ? (
-                          <>
-                            <small>PRICE</small>
-
-                            <strong>
-                              {service.price}
-                            </strong>
-                          </>
-                        ) : (
-                          <span>CONTACT US</span>
-                        )}
-
-                      </div>
-
-                    </div>
-
-                  ))
-
-                )}
-
-              </div>
-
-
-              <div className="pricing-modal-footer">
-
-                <p>
-                  Prices may vary depending on vehicle and required service.
-                </p>
-
-                <a
-                  href="#appointment"
-                  onClick={() => setPricingModalOpen(false)}
-                >
-                  BOOK APPOINTMENT →
-                </a>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        )}
 
         {/* ================= SERVICES & PRICING POPUP ================= */}
 

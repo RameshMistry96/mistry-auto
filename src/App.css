@@ -1384,7 +1384,7 @@ body {
    TABLET
 ========================= */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
   .services-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1456,20 +1456,6 @@ body {
 
   .review-arrow-right {
     right: -18px;
-  }
-    /* CONTACT TABLET */
-
-  .contact-container {
-    grid-template-columns: 1fr;
-    gap: 60px;
-  }
-
-  .contact-info {
-    max-width: 750px;
-  }
-
-  .appointment-panel {
-    max-width: 850px;
   }
 
 }
@@ -2107,6 +2093,12 @@ body {
 
 @media (max-width: 650px) {
 
+  .hero h1 {
+  font-size: 42px;
+  line-height: 0.98;
+  letter-spacing: -1px;
+}
+
   /* SERVICES */
 
   .services-section {
@@ -2403,25 +2395,6 @@ body {
     align-items: flex-start;
 
     gap: 12px;
-  }
-
-}
-
-  /* CONTACT TABLET FIX */
-
-@media (min-width: 651px) and (max-width: 1000px) {
-
-  .contact-container {
-    grid-template-columns: 1fr;
-    gap: 60px;
-  }
-
-  .contact-info {
-    max-width: 750px;
-  }
-
-  .appointment-panel {
-    max-width: 850px;
   }
 
 }
@@ -3999,4 +3972,957 @@ body {
     text-align: center;
   }
 
+}/* =====================================================
+   UNIVERSAL LARGE SCREEN SCALING
+===================================================== */
+
+@media (min-width: 1600px) {
+
+  html {
+  font-size: 18px;
 }
+
+  /* NAVBAR */
+
+  .navbar {
+    height: 120px;
+  }
+
+.nav-container {
+  width: 88%;
+  max-width: 1800px;
+  padding: 0;
+}
+
+  .nav-logo {
+    width: 205px;
+    height: 95px;
+  }
+
+  .nav-links {
+    gap: 38px;
+  }
+
+  .nav-links a,
+  .nav-services-button {
+    font-size: 14px;
+  }
+
+  .nav-links .appointment-btn {
+    padding: 17px 25px;
+  }
+
+
+  /* HERO */
+
+  .hero {
+    min-height: 720px;
+  }
+
+.hero-container {
+  width: 88%;
+  max-width: 1800px;
+  padding: 80px 0;
+}
+
+  .hero-content {
+    max-width: 650px;
+  }
+
+  .hero-small-title {
+    font-size: 14px;
+  }
+
+  .hero h1 {
+    font-size: 82px;
+  }
+
+  .hero h2 {
+    font-size: 17px;
+  }
+
+  .hero p {
+    max-width: 540px;
+    font-size: 18px;
+  }
+
+  .hero-buttons a {
+    padding: 18px 27px;
+    font-size: 13px;
+  }
+
+
+  /* SERVICES */
+
+  .services-section {
+    padding: 110px 45px 120px;
+  }
+
+  .services-heading {
+    margin-bottom: 60px;
+  }
+
+  .services-heading > span {
+    font-size: 13px;
+  }
+
+  .services-heading h2 {
+    font-size: 48px;
+  }
+
+  .services-heading p {
+    font-size: 17px;
+  }
+
+    .services-grid {
+      width: 88%;
+      max-width: 1700px;
+      gap: 30px;
+    }
+
+  .service-image {
+    height: 255px;
+  }
+
+  .service-content {
+    padding: 30px;
+  }
+
+  .service-content h3 {
+    font-size: 21px;
+  }
+
+  .service-content p {
+    font-size: 15px;
+  }
+}
+
+
+/* =====================================================
+   EXTRA LARGE / 2K / 4K MONITORS
+===================================================== */
+
+@media (min-width: 2200px) {
+
+
+  .hero {
+    min-height: 820px;
+  }
+
+  .hero-content {
+    max-width: 760px;
+  }
+
+  .hero h1 {
+    font-size: 96px;
+  }
+
+  .hero p {
+    font-size: 20px;
+  }
+
+  .services-heading h2 {
+    font-size: 54px;
+  }
+
+  .service-image {
+    height: 290px;
+  }
+}
+
+/* =====================================================
+   WIDE DESKTOP VISUAL SCALE
+===================================================== */
+
+@media (min-width: 1600px) {
+
+  .nav-container,
+  .hero-container {
+    width: 82%;
+    max-width: 1750px;
+  }
+
+  .navbar {
+    height: 125px;
+  }
+
+  .nav-logo {
+    width: 220px;
+    height: 105px;
+  }
+
+  .nav-links {
+    gap: 40px;
+  }
+
+  .nav-links a,
+  .nav-services-button {
+    font-size: 15px;
+  }
+
+  .nav-links .appointment-btn {
+    padding: 18px 28px;
+  }
+
+
+  /* HERO */
+
+  .hero {
+    min-height: 760px;
+  }
+
+  .hero-container {
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+
+  .hero-content {
+    max-width: 720px;
+  }
+
+  .hero-small-title {
+    font-size: 15px;
+    letter-spacing: 5px;
+  }
+
+  .hero h1 {
+    font-size: 92px;
+  }
+
+  .hero-line {
+    width: 85px;
+    height: 5px;
+    margin: 32px 0;
+  }
+
+  .hero h2 {
+    font-size: 18px;
+  }
+
+  .hero p {
+    max-width: 580px;
+    font-size: 20px;
+  }
+
+  .hero-buttons a {
+    font-size: 14px;
+    padding: 19px 29px;
+  }
+
+
+  /* SERVICES */
+
+  .services-section {
+    padding-top: 125px;
+    padding-bottom: 135px;
+  }
+
+  .services-heading {
+    max-width: 850px;
+    margin-bottom: 65px;
+  }
+
+  .services-heading > span {
+    font-size: 14px;
+  }
+
+  .services-heading h2 {
+    font-size: 52px;
+  }
+
+  .services-heading p {
+    font-size: 18px;
+  }
+
+  .services-grid {
+    width: 82%;
+    max-width: 1650px;
+  }
+
+  .service-image {
+    height: 285px;
+  }
+
+  .service-content {
+    padding: 32px;
+  }
+
+  .service-content h3 {
+    font-size: 23px;
+  }
+
+  .service-content p {
+    font-size: 16px;
+  }
+}
+
+
+/* =====================================================
+   WIDE DESKTOP - REMAINING WEBSITE SECTIONS
+===================================================== */
+
+@media (min-width: 1600px) {
+
+  /* WHY CHOOSE US */
+
+  .why-section {
+    padding: 125px 0;
+  }
+
+  .why-container {
+    width: 82%;
+    max-width: 1650px;
+    gap: 100px;
+  }
+
+  .why-image {
+    height: 720px;
+  }
+
+  .why-content > h2 {
+    font-size: 55px;
+  }
+
+  .why-description {
+    font-size: 18px;
+    max-width: 650px;
+  }
+
+  .why-features {
+    gap: 34px;
+  }
+
+  .why-item h3 {
+    font-size: 17px;
+  }
+
+  .why-item p {
+    font-size: 15px;
+  }
+
+
+  /* ABOUT */
+
+  .about-section {
+    padding: 130px 0;
+  }
+
+  .about-container {
+    width: 82%;
+    max-width: 1650px;
+    gap: 110px;
+  }
+
+  .about-content {
+    max-width: 700px;
+  }
+
+  .about-content > h2 {
+    font-size: 56px;
+  }
+
+  .about-main-text {
+    font-size: 18px;
+  }
+
+  .about-second-text {
+    font-size: 16px;
+  }
+
+  .about-image {
+    height: 720px;
+  }
+
+  .about-highlight h3 {
+    font-size: 16px;
+  }
+
+  .about-highlight p {
+    font-size: 15px;
+  }
+
+
+  /* GALLERY */
+
+  .gallery-section {
+    padding: 130px 0 140px;
+  }
+
+  .gallery-container {
+    width: 82%;
+    max-width: 1650px;
+  }
+
+  .gallery-heading h2 {
+    font-size: 56px;
+  }
+
+  .gallery-heading-right {
+    max-width: 540px;
+  }
+
+  .gallery-heading-right p {
+    font-size: 18px;
+  }
+
+  .gallery-grid {
+    grid-auto-rows: 320px;
+    gap: 22px;
+  }
+
+
+  /* REVIEWS */
+
+  .reviews-section {
+    padding: 130px 0 140px;
+  }
+
+  .reviews-container {
+    width: 82%;
+    max-width: 1450px;
+  }
+
+  .reviews-heading {
+    max-width: 850px;
+  }
+
+  .reviews-heading h2 {
+    font-size: 54px;
+  }
+
+  .reviews-heading p {
+    font-size: 18px;
+  }
+
+  .review-slider {
+    max-width: 1150px;
+  }
+
+  .review-card {
+    min-height: 420px;
+    padding: 55px 65px 48px;
+  }
+
+  .review-text {
+    font-size: 22px;
+  }
+
+
+  /* CONTACT + APPOINTMENT */
+
+  .contact-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .contact-container {
+    width: 82%;
+    max-width: 1650px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /* FOOTER */
+
+  .footer-container {
+    width: 82%;
+    max-width: 1650px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* =====================================================
+   COMPACT DESKTOP NAVBAR - 901px TO 1200px
+===================================================== */
+
+@media (min-width: 901px) and (max-width: 1200px) {
+
+  .nav-container {
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    width: 150px;
+    height: 78px;
+  }
+
+  .nav-links {
+    gap: 22px;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+  .nav-links .appointment-btn {
+    padding: 14px 17px;
+    white-space: nowrap;
+  }
+
+  .nav-services-button {
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+}
+
+/* =====================================================
+   MOBILE / TABLET NAVIGATION
+===================================================== */
+
+.mobile-menu-button {
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  cursor: pointer;
+}
+
+.mobile-menu-button span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 5px 0;
+
+  background: #ffffff;
+
+  transition: 0.25s ease;
+}
+
+
+/* TABLET + MOBILE */
+
+@media (max-width: 900px) {
+
+  .navbar {
+    position: relative;
+  }
+
+  .mobile-menu-button {
+    display: block;
+    margin-left: auto;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+
+    z-index: 1000;
+
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+
+    padding: 18px 24px 24px;
+
+    background: #050708;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.35);
+  }
+
+  .nav-links.mobile-open {
+    display: flex;
+  }
+
+  .nav-links > a,
+  .nav-services-button {
+    width: 100%;
+
+    padding: 14px 0;
+
+    text-align: left;
+  }
+
+ .nav-services-dropdown {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+  .nav-services-menu {
+    position: static;
+
+    width: 100%;
+    min-width: 0;
+
+    margin-top: 4px;
+
+    left: auto;
+    transform: none;
+
+    box-shadow: none;
+  }
+
+  .nav-appointment {
+    width: 100%;
+
+    margin-top: 10px;
+
+    text-align: center !important;
+  }
+
+
+  /* HAMBURGER -> X */
+
+  .mobile-menu-button.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .mobile-menu-button.open span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-menu-button.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+@media (max-width: 900px) {
+
+  .nav-links {
+    gap: 0;
+  }
+
+  .nav-links > a,
+  .nav-services-button {
+    padding: 12px 0;
+    min-height: auto;
+  }
+
+  .nav-services-menu {
+    margin: 6px 0 10px;
+  }
+
+  .nav-services-menu a,
+  .nav-services-menu button {
+    padding: 16px 20px;
+  }
+
+  .nav-appointment {
+    margin-top: 12px;
+    padding: 14px 18px !important;
+  }
+}
+
+/* =========================================
+   MOBILE HERO FINAL FIX
+========================================= */
+
+@media (max-width: 650px) {
+
+  .hero {
+    min-height: calc(100vh - 105px);
+    background-position: 64% center;
+    align-items: center;
+  }
+
+  .hero-container {
+    padding: 45px 20px 50px;
+  }
+
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-small-title {
+    font-size: 11px;
+    letter-spacing: 3.5px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+    line-height: 0.98;
+    letter-spacing: -1px;
+    margin-top: 15px;
+  }
+
+  .hero-line {
+    width: 60px;
+    height: 3px;
+    margin: 22px 0;
+  }
+
+  .hero h2 {
+    font-size: 14px;
+    line-height: 1.25;
+    letter-spacing: 2.5px;
+    margin-bottom: 18px;
+  }
+
+  .hero p {
+    max-width: 330px;
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 26px;
+  }
+
+  .hero-buttons {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .hero-buttons a {
+    padding: 15px 20px;
+    font-size: 11px;
+  }
+}
+/* =====================================================
+   CONTACT + APPOINTMENT - MOBILE FINAL FIX
+===================================================== */
+
+@media (max-width: 650px) {
+
+  .contact-section {
+    width: 100%;
+    padding: 75px 20px 80px;
+    overflow: hidden;
+  }
+
+  .contact-container {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 45px;
+    margin: 0;
+  }
+
+  .contact-info {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .appointment-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    padding: 35px 22px;
+
+    margin: 0;
+  }
+
+  .appointment-heading {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .appointment-heading h2 {
+    font-size: 28px;
+    line-height: 1.15;
+    overflow-wrap: break-word;
+  }
+
+  .appointment-form {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .form-row {
+    width: 100%;
+    min-width: 0;
+
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .form-group {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .appointment-submit {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+/* =====================================================
+   FINAL IPAD / TABLET FIX
+   651px - 1100px
+===================================================== */
+
+@media (min-width: 651px) and (max-width: 1100px) {
+
+html,
+body,
+#root,
+.App {
+  width: 100%;
+  max-width: 100%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+  /* =========================
+     CONTACT + APPOINTMENT
+  ========================= */
+
+  .contact-section {
+    width: 100%;
+    padding: 80px 30px 90px;
+  }
+
+  .contact-container {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 50px;
+  }
+
+  .contact-info {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .appointment-panel {
+    width: 100%;
+    max-width: 850px;
+    min-width: 0;
+
+    margin: 0 auto;
+    padding: 42px 35px;
+  }
+
+  .appointment-form,
+  .form-row,
+  .form-group {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .form-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+
+  /* =========================
+     FOOTER
+  ========================= */
+
+  .footer {
+    width: 100%;
+    height: auto;
+  }
+
+  .footer-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+
+    padding: 50px 35px 45px;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 45px 60px;
+  }
+
+  .footer-brand,
+  .footer-column {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .footer-logo {
+    width: 180px;
+    height: 85px;
+    margin-bottom: 18px;
+  }
+
+  .footer-bottom {
+    width: 100%;
+  }
+
+  .footer-bottom-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+
+    padding: 20px 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+}
+
+
+/* =====================================================
+   FINAL SMALL IPAD / LARGE PHONE FIX
+===================================================== */
+
+@media (min-width: 651px) and (max-width: 800px) {
+
+  .contact-section {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+
+  .appointment-panel {
+    padding: 38px 28px;
+  }
+
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .footer-container {
+    padding-left: 30px;
+    padding-right: 30px;
+
+    gap: 45px 40px;
+  }
+
+  .footer-bottom-container {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+
+
