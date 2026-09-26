@@ -517,17 +517,24 @@ return (
 
                             <div className="pricing-card-bottom">
 
-                              <div className="pricing-card-price">
-                                <small>PRICE</small>
+                            <div className="pricing-card-price">
 
-                                {services[activePricingIndex]?.price ? (
+                              {services[activePricingIndex]?.price ? (
+                                <>
+                                  <small>STARTING FROM</small>
+
                                   <strong>
-                                    {services[activePricingIndex].price}
+                                    ${Number(services[activePricingIndex].price).toFixed(2)}*
                                   </strong>
-                                ) : (
-                                  <strong>CONTACT US</strong>
-                                )}
-                              </div>
+                                </>
+                              ) : (
+                                <>
+                                  <small>PRICE</small>
+                                  <strong>GET A QUOTE</strong>
+                                </>
+                              )}
+
+                            </div>
 
                               <a
                                 href="#appointment"
@@ -585,9 +592,9 @@ return (
 
                   )}
 
-                  <div className="pricing-stack-note">
-                    Prices may vary depending on vehicle and required service.
-                  </div>
+                <div className="pricing-stack-note">
+                  *Price may vary by vehicle, parts and service requirements. Taxes extra.
+                </div>
 
                 </div>
 
@@ -2063,12 +2070,6 @@ function ServiceCard({
           <h3>{title}</h3>
 
           <p>{description}</p>
-
-          {price && (
-            <div className="service-card-price">
-              {price}
-            </div>
-          )}
 
           <button
           type="button"
